@@ -1,129 +1,156 @@
-# 事前交易风控
+# Pre-Trade Risk Control
 
-RiskManager模块是用于**事前交易风控**的功能模块，用户可以通过其配置json文件操作来便捷完成风控任务。
+The **RiskManager** module is a functional module used for **pre-trade risk control**. Users can conveniently complete risk-control tasks by operating through its JSON configuration file.
 
+## Key Advantages
 
-## 主要优势
+The RiskManager module provides standardized development templates for risk-control rules and supports users in developing various custom risk-control rules as needed.
 
-RiskManager模块提供包括标准化的风控规则开发模板，支持用户按需开发各种自定义风控规则。
+Built-in common risk-control rules include:
 
-内置常用风控规则包括：
+* **BlackListRule**: blacklist rule
+* **WhiteListRule**: whitelist rule
+* **OrderLimitRule**: order quantity and value limit rule
+* **SelfTradeRule**: self-trade restriction rule
+* **RiskLevelRule**: account risk-level limit rule
+* **OrderFlowRule**: order flow / rate limit rule
+* **PriceRangeRule**: price deviation rule
+* **PosLimitRule**: position upper-limit rule
+* **TradeValueRule**: intraday opening exposure limit rule
 
-* BlackListRule: 黑名单规则
-* WhiteListRule: 白名单规则
-* OrderLimitRule: 委托数量和金额限制规则
-* SelfTradeRule: 自成交限制规则
-* RiskLevelRule: 账户风险度限制规则
-* OrderFlowRule: 委托流量限制规则
-* PriceRangeRule: 价格偏离度规则
-* PosLimitRule: 持仓上限规则
-* TradeValueRule: 日内开仓限制规则
+## Starting the Module
 
+Before starting, the RiskManager module must be loaded via the **[Strategy Application]** tab.
 
-## 启动模块
+After launching **VeighNa Elite Trader**, **connect the trading gateway/interface first** before starting the module. Only start the module after the **[Log]** panel in the main UI outputs: **“Contract information query succeeded”**.
 
-RiskManager模块需要启动之前通过【策略应用】标签页加载。
+Note: For the **IB gateway**, since it cannot automatically fetch all contract information at login, contract information is only available after the user manually subscribes to market data. Therefore, you must **manually subscribe to the contract’s market data in the main UI first**, then start the module.
 
-启动登录VeighNa Elite Trader后，启动模块之前，请先连接交易接口。看到VeighNa Elite Trader主界面【日志】栏输出“合约信息查询成功”之后再启动模块。
-
-请注意，IB接口因为登录时无法自动获取所有的合约信息，只有在用户手动订阅行情时才能获取。因此需要在主界面上先行手动订阅合约行情，再启动模块。
-
-成功连接交易接口后，在菜单栏中点击【功能】-> 【风控引擎】，或者点击左侧按钮栏的图标：
+After successfully connecting the trading interface, click **[Functions] -> [Risk Control Engine]** in the menu bar, or click the icon in the left-side toolbar:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/riskmanager/1.png)
 
-即可进入风控引擎模块的UI界面，如下图所示：
+This will open the UI of the risk control engine module, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/riskmanager/2.png)
 
+## Configuring Risk Control
 
-## 配置风控
+The pre-trade risk-control module checks whether an order complies with various risk-control rules **before** the order is sent via the trading API.
 
-事前风控模块负责在委托通过交易API接口发出前，检查其状态是否符合各种风控规则。
-
-用户可通过编辑.vntrader文件夹下的risk_engine_setting.json配置风控规则，如下图所示（仅示例）：
+Users can configure risk-control rules by editing `risk_engine_setting.json` under the `.vntrader` folder, as shown below (example only):
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/riskmanager/3.png)
 
-**请注意，风控规则配置的时候，对应规则的“active”要设置为true才会启用规则，设置为false是不会启用的。**
+**Important:** When configuring a risk-control rule, the rule’s `active` field must be set to `true` to enable it. If set to `false`, the rule will not be enabled.
 
-成功配置风控规则之后，启动VeighNa Elite Trader并加载风控引擎模块即可在发出委托之前检查每一笔发出的委托是否符合风控要求。若委托被风控引擎拦截，VeighNa Elite Trader主界面的【日志】栏会输出相应日志，风控引擎的UI界面也会输出日志，如下图所示：
+After configuring the risk-control rules, start **VeighNa Elite Trader** and load the risk-control engine module. Then, before each order is sent, the system will check whether it meets the risk-control requirements. If an order is blocked by the risk-control engine, the main UI **[Log]** panel will output the relevant log, and the risk-control engine UI will also output a log, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/riskmanager/4.png)
 
+## Risk-Control Rule Descriptions
 
-## 风控规则介绍
+### BlackListRule: Blacklist Rule
 
-### BlackListRule: 黑名单规则
+* `black_list [list[str]]`: blacklist
 
- - black_list[list[str]] 黑名单
+After enabled, orders whose `vt_symbol` is in the blacklist will be blocked.
 
- 启用之后，在黑名单列表内的vt_symbol委托会被拦截。
+### WhiteListRule: Whitelist Rule
 
-### WhiteListRule: 白名单规则
+* `white_list [list[str]]`: whitelist
 
- - white_list[list[str]] 白名单
+After enabled, orders whose `vt_symbol` is **not** in the whitelist will be blocked.
 
- 启用之后，不在白名单列表内的vt_symbol委托会被拦截。
+### OrderLimitRule: Order Quantity and Value Limit Rule
 
-### OrderLimitRule: 委托数量和金额限制规则
+* `order_cancel_limit [int]`: maximum number of cancellations per day
+* `order_volume_limit [int]`: maximum volume per single order
+* `order_value_limit [float]`: maximum value per single order
 
- - order_cancel_limit[int] 日内撤单次数上限
- - order_volume_limit[int] 单笔委托数量上限
- - order_value_limit[float] 单笔委托金额上限
+After enabled:
 
- 启用之后，找不到对应vt_symbol合约信息的委托会被拦截，日内撤单次数超过配置上限，单笔委托数量超过配置上限以及单笔委托金额超过配置上限的委托都会被拦截。
+* Orders for which the contract information for the corresponding `vt_symbol` cannot be found will be blocked.
+* Orders will be blocked if daily cancellations exceed the configured limit.
+* Orders will be blocked if single-order volume exceeds the configured limit.
+* Orders will be blocked if single-order value exceeds the configured limit.
 
-### SelfTradeRule: 自成交限制规则
+### SelfTradeRule: Self-Trade Restriction Rule
 
- 启用之后，委托方向与未成交委托相反且委托价格超过未成交委托价格的委托（以多头为例，新委托方向为多，未成交方向为空，且新委托价格大于等于未成交空方向委托价格）会被拦截。
+After enabled, an order will be blocked if:
 
-### RiskLevelRule: 账户风险度限制规则
+* Its direction is opposite to an existing unfilled order **and**
+* Its price exceeds the price of the unfilled order.
 
- - risk_level_limit[float] 保证金风险度上限（只支持单账户）
+(Example for a long position: the new order is **buy**, the existing unfilled order is **sell**, and the new order price is **greater than or equal to** the sell order’s price.)
 
- 启用之后，接口获取不到账户当前资金时发出的委托会被拦截，账户冻结资金/账户余额小于配置的保证金风险度上限时发出的委托也会被拦截。
+### RiskLevelRule: Account Risk-Level Limit Rule
 
-### PriceRangeRule: 价格偏离度规则
+* `risk_level_limit [float]`: maximum margin risk level (single account only)
 
- - price_range_limit[float] 价格偏离度
+After enabled:
 
- 启用之后，没有获取到对应vt_symbol实时行情的委托会被拦截，委托价格超过合约涨跌停价或者委托价格超过价格上下限的委托都会被拦截。
+* Orders sent when the gateway cannot retrieve the account’s current funds will be blocked.
+* Orders will also be blocked when **frozen funds / account balance** is **below** the configured margin risk-level threshold.
 
- 请注意，价格上下限是基于合约最新价 * (1 +/- price_range_limit)然后取min/max再基于合约价格跳动进行调整的。
+### PriceRangeRule: Price Deviation Rule
 
-### PosLimitRule: 持仓上限规则
+* `price_range_limit [float]`: allowed price deviation
 
- - contract_setting[dict]
-  - vt_symbol(key)
-  - setting(value)
-   - long_pos_limit[int] 多头仓位限制
-   - short_pos_limit[int] 空头仓位限制
-   - net_pos_limit[int] 净仓位限制
-   - total_pos_limit[int] 总仓位限制
-   - oi_percent_limit[float] 日内成交净额限制
+After enabled:
 
- 启用之后，没有获取到对应vt_symbol实时行情的委托会被拦截，委托合约多仓总数量、空仓总数量、净仓总数量、总仓总数量以及持仓集中度超限的委托会被拦截。
+* Orders will be blocked if real-time market data for the corresponding `vt_symbol` is not available.
+* Orders will be blocked if the order price exceeds the contract’s limit-up/limit-down prices.
+* Orders will be blocked if the order price is outside the allowed upper/lower bounds.
 
- 请注意，持仓集中度超限认定是委托合约的总仓位超过了委托合约的持仓量（tick.open_interest）与配置的该合约日内成交净额限制的乘积。
+Note: The upper/lower bounds are computed based on:
+`latest_price * (1 +/- price_range_limit)`
+Then `min/max` is applied, and the result is adjusted according to the contract’s price tick size.
 
-### TradeValueRule: 日内开仓限制规则
+### PosLimitRule: Position Upper-Limit Rule
 
- - contract_setting[dict]
-  - vt_symbol(key)
-  - setting(value)
-   - trade_value_limit[int] 日内成交敞口变化上限
+* `contract_setting [dict]`
 
- 启用之后，发出委托与缓存的该合约日内成交敞口累加超过配置的变化上限就会被拦截。
+  * `vt_symbol` (key)
+  * `setting` (value)
 
- 请注意，缓存配置合约的每一笔委托成交敞口都是基于委托价格、委托数量以及合约乘数的乘积计算的。
+    * `long_pos_limit [int]`: long position limit
+    * `short_pos_limit [int]`: short position limit
+    * `net_pos_limit [int]`: net position limit
+    * `total_pos_limit [int]`: total position limit
+    * `oi_percent_limit [float]`: intraday net traded value limit
 
-### OrderFlowRule: 委托流量限制规则
+After enabled:
 
- - order_flow_interval[int] 委托流控时间窗口
- - order_flow_limit[int] 委托流控给定时间窗口内最多允许发出的委托笔数
- - total_order_limit[int] 日内总委托笔数上限
+* Orders will be blocked if real-time market data for the corresponding `vt_symbol` is not available.
+* Orders will be blocked if the contract’s total long position, total short position, net position, total position, or position concentration exceeds limits.
 
- 启用之后，发出委托笔数在配置的流控时间窗口内超过配置的最多允许委托笔数就会被拦截，发出委托笔数超过配置的当日总委托笔数上限也会被拦截。
+Note: Position concentration is considered exceeded when the contract’s total position is greater than:
+`tick.open_interest * oi_percent_limit`.
 
- 请注意，日内总委托笔数取决于主引擎查到的所有委托的长度。
+### TradeValueRule: Intraday Opening Exposure Limit Rule
+
+* `contract_setting [dict]`
+
+  * `vt_symbol` (key)
+  * `setting` (value)
+
+    * `trade_value_limit [int]`: upper limit on intraday change in traded exposure
+
+After enabled, if the exposure impact of a new order plus the cached intraday exposure for that contract exceeds the configured limit, the order will be blocked.
+
+Note: Each filled order’s exposure is calculated as:
+`order_price * order_volume * contract_multiplier`.
+
+### OrderFlowRule: Order Flow / Rate Limit Rule
+
+* `order_flow_interval [int]`: time window for order flow control
+* `order_flow_limit [int]`: max number of orders allowed within the time window
+* `total_order_limit [int]`: max total number of orders per day
+
+After enabled:
+
+* Orders will be blocked if the number of orders sent within the configured time window exceeds the maximum allowed.
+* Orders will also be blocked if the number of orders sent exceeds the configured daily total order limit.
+
+Note: The daily total order count depends on the length of all orders found by the main engine.
