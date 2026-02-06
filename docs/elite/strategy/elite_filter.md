@@ -1,25 +1,24 @@
-# 行情数据过滤
+# Market Data Filtering
 
-VeighNa Elite Trader的CTA策略模块内置的EliteCtaTemplate提供了对垃圾数据的过滤配置支持。根据示例的格式进行配置之后，EliteCtaTemplate会对非交易时段收到的合成K线进行过滤，避免垃圾数据对策略指标计算结果产生影响。
+The CTA strategy module of VeighNa Elite Trader has built-in support for filtering junk data in the EliteCtaTemplate. After configuring according to the example format, EliteCtaTemplate will filter synthesized K-lines received during non-trading periods, avoiding the impact of junk data on the calculation results of strategy indicators.
 
+## Configuring Filter Information
 
-## 配置过滤信息
+### Using the Officially Provided File
 
-### 使用官方提供文件
-
-在VeighNa Elite Trader主界面点击【帮助】- 【更新Tick过滤】即可将生成最新的过滤配置文件filter_setting.json，如下图所示：
+In the VeighNa Elite Trader main interface, click [Help] - [Update Tick Filter] to generate the latest filter configuration file filter_setting.json, as shown in the following images:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/filter/1.png)
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/filter/2.png)
 
-请注意，**该filter_setting.json文件仅供参考，若与实际交易时段有出入（交易所对合约交易时段进行调整），VeighNa官方概不负责**。
+Please note that **this filter_setting.json file is for reference only. If it differs from the actual trading periods (due to adjustments by the exchange to contract trading periods), VeighNa official is not responsible**.
 
-filter_setting.json文件生成之后，会放置在VeighNa Elite Trader运行目录（通常是用户目录）下的.vntrader文件夹中。
+After the filter_setting.json file is generated, it will be placed in the .vntrader folder under the VeighNa Elite Trader running directory (usually the user directory).
 
-### 手动编辑文件
+### Manually Editing the File
 
-如果交易的品种较少，可以自己手动创建一个filter_setting.json文件并填入相应合约交易时间配置信息（允许推送进策略的K线时间段），如下图所示：
+If the number of traded varieties is small, you can manually create a filter_setting.json file and fill in the corresponding contract trading time configuration information (the K-line time periods allowed to be pushed into the strategy), as shown below:
 
 ```
 {
@@ -43,22 +42,21 @@ filter_setting.json文件生成之后，会放置在VeighNa Elite Trader运行�
 }
 ```
 
-请注意：
- - VeighNa的K线的datetime是K线的开始时间不是结束时间；
+Please note:
+ - The datetime of K-lines in VeighNa is the start time of the K-line, not the end time;
 
- - 若交易商品期货，请不要忘记10:15到10:30的休盘时间；
+ - If trading commodity futures, do not forget the break time from 10:15 to 10:30;
 
- - 若交易合约的交易时间涉及到跨日，请把夜盘的交易时间拆分成开始时间至23:59:59和00:00:00至结束时间两段。
+ - If the trading time of the contract involves overnight sessions, split the night session trading time into two segments: from the start time to 23:59:59 and from 00:00:00 to the end time.
 
-配置好filter_setting.json文件后，将其放置在VeighNa Elite Trader运行目录下的.vntrader文件夹中即可。
+After configuring the filter_setting.json file, place it in the .vntrader folder under the VeighNa Elite Trader running directory.
 
+## Testing Filter Effect
 
-## 过滤效果测试
-
-若想要测试数据过滤功能的效果，可以在策略的on_history函数中添加打印语句看看策略内部是否收到了非交易时段的K线，如下所示：
+If you want to test the effect of the data filtering function, you can add print statements in the strategy's on_history function to check if the strategy internally receives K-lines from non-trading periods, as shown below:
 
 ```python3
-# 判断实盘trading状态，只有策略启动之后才进行输出
+# Judge the live trading status, and only output after the strategy is started
 if self.trading:
     self.write_log(f"{self.strategy_name}_{self.vt_symbol}：{hm.datetime[-1]}")
 ```
