@@ -1,373 +1,357 @@
-# CTA趋势策略
+# CTA Trend Strategy
 
-CtaStrategy是用于**CTA自动交易**的功能模块，用户可以通过其UI界面操作来便捷完成策略初始化、策略启动、策略停止、策略参数编辑以及策略移除等任务。
+CtaStrategy is a functional module for **CTA automated trading**. Users can conveniently complete tasks such as strategy initialization, starting, stopping, parameter editing, and removal through its UI interface.
 
+## Main Advantages
 
-## 主要优势
+The CtaStrategy module fully utilizes multi-core CPUs and supports multi-process CTA strategy trading. It also provides a professional CTA strategy template, EliteCtaTemplate, to enable more powerful CTA strategy development.
 
-CtaStrategy模块充分利用了多核CPU，支持多进程CTA策略交易。并提供了专业CTA策略模板EliteCtaTemplate，以实现更加强大的CTA策略开发。
+To address inconsistencies between backtesting and live trading, EliteCtaTemplate includes a built-in scheme for [maintaining strategy operation based on theoretical targets](#jump1). Additionally, EliteCtaTemplate supports filtering configurations for junk data during non-trading periods (refer to the filtering configuration section for details).
 
-针对回测和实盘不一致的问题，EliteCtaTemplate内置了一套[基于策略的理论目标维护策略运行](#jump1)的方案。另外，EliteCtaTemplate还提供了对非交易时段垃圾数据的过滤配置支持（具体可参考过滤配置篇）。
+## Starting the Module
 
+The CtaStrategy module needs to be loaded via the [Strategy Application] tab before starting.
 
-## 启动模块
+After starting and logging into VeighNa Elite Trader, connect to the trading interface before launching the module. Proceed to start the module only after seeing the "Contract information query successful" output in the [Log] section of the VeighNa Elite Trader main interface.
 
-CtaStrategy模块需要启动之前通过【策略应用】标签页加载。
+Note that the IB interface cannot automatically retrieve all contract information upon login; it only obtains it when users manually subscribe to market quotes. Therefore, manually subscribe to contract quotes on the main interface first, then start the module.
 
-启动登录VeighNa Elite Trader后，启动模块之前，请先连接交易接口。看到VeighNa Elite Trader主界面【日志】栏输出“合约信息查询成功”之后再启动模块。
-
-请注意，IB接口因为登录时无法自动获取所有的合约信息，只有在用户手动订阅行情时才能获取。因此需要在主界面上先行手动订阅合约行情，再启动模块。
-
-成功连接交易接口后，在菜单栏中点击【功能】-> 【多进程CTA交易】，或者点击左侧按钮栏的图标：
+After successfully connecting to the trading interface, click [Functions] -> [Multi-Process CTA Trading] in the menu bar, or click the icon in the left button bar:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/1.png)
 
-即可进入多进程CTA交易模块的UI界面。
+This will enter the UI interface of the multi-process CTA trading module.
 
-如果配置了数据服务，打开CTA策略模块时会自动执行数据服务登录初始化。若成功登录，则会输出“数据服务初始化成功”的日志，如下图所示：
+If data services are configured, the CTA strategy module will automatically perform data service login initialization upon opening. If login is successful, it will output the log "Data service initialization successful," as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/2.png)
 
-
-## 策略文件目录
+## Strategy File Directory
 
 <span id="jump">
 
-对于用户自行开发的策略，需要放到VeighNa Elite Trader运行时目录下的**strategies**目录中，才能被识别加载。具体的运行时目录路径，可以在VeighNa Elite Trader主界面顶部的标题栏查看。
+For user-developed strategies, they need to be placed in the **strategies** directory under the VeighNa Elite Trader runtime directory to be recognized and loaded. The specific runtime directory path can be viewed in the title bar at the top of the VeighNa Elite Trader main interface.
 
-对于在Windows上默认安装的用户来说，放置策略的strategies目录路径通常为：
+For users with default installation on Windows, the strategies directory path for placing strategies is typically:
 
 ```
 C:\Users\Administrator\strategies
 ```
 
-其中Administrator为当前登录Windows的系统用户名。
+Where Administrator is the current logged-in Windows system username.
 
 </span>
 
+## Creating Strategy Instances
 
-## 创建策略实例
+Users can create different strategy instances (objects) based on well-written CTA strategy templates (classes). The advantage of strategy instances is that the same strategy can trade multiple contract varieties simultaneously, and each instance can have different parameters.
 
-用户可以基于编写好的CTA策略模板（类）来创建不同的策略实例（对象）。策略实例的好处在于，同一个策略可以同时去交易多个品种合约，并且每个实例的参数可以是不同的。
-
-在左上角的下拉框中选择要交易的策略名称，如下图所示：
+In the upper-left dropdown box, select the strategy name to trade, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/3.png)
 
-请注意，显示的策略名称是**策略类**（驼峰式命名）的名字，而不是策略文件（下划线模式命名）的名字。
+Note that the displayed strategy name is the **strategy class** name (camel case), not the strategy file name (underscore naming).
 
-选择好策略类之后，点击【添加策略】，会弹出添加策略对话框，如下图所示：
+After selecting the strategy class, click [Add Strategy], and the Add Strategy dialog box will appear, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/4.png)
 
-在创建策略实例时，需要配置相关参数，各参数要求如下：
+When creating a strategy instance, relevant parameters need to be configured, with the following requirements:
 
-- 实例名称
-  - 实例名称不能重名；
-- 合约品种
-  - 格式为vt_symbol（合约代码 + 交易所名称）；
-  - 一定要是实盘交易系统中可以查到的合约名称；
-  - 一般选择该期货品种当前流动性最好的月份；
-- 接口名称
-  - 选择需要交易的接口名称；
-- 参数设置
-  - 显示的参数名称是策略中使用Parameter辅助类定义的参数；
-  - 默认数值为策略中的参数的默认值；
-  - 由上图可观察到，参数名后面<>括号中显示的是该参数的数据类型，在填写参数时应遵循相应的数据类型。其中，<class 'str'>是字符串、<class 'int'>是整数、<class 'float'>是浮点数；
-  - 请注意，如果某个参数可能会调整至有小数位的数值，而默认参数值是整数（比如1）。请在编写策略时，把默认参数值设为浮点数（比如1.0）。否则策略会默认该项参数为整数，在后续【编辑】策略实例参数时，会只允许填进整数。
+- Instance Name
+  - Instance names cannot be duplicated;
+- Contract Variety
+  - Format is vt_symbol (contract code + exchange name);
+  - Must be a contract name that can be queried in the live trading system;
+  - Generally, select the month with the best liquidity for the futures variety;
+- Interface Name
+  - Select the interface name for trading;
+- Parameter Settings
+  - The displayed parameter names are those defined using the Parameter helper class in the strategy;
+  - Default values are the default values of the parameters in the strategy;
+  - As observed in the figure above, the parameter name is followed by <> brackets showing the data type of the parameter. When filling in parameters, follow the corresponding data type. Where <class 'str'> is string, <class 'int'> is integer, <class 'float'> is float;
+  - Note that if a parameter may be adjusted to a value with decimal places, and the default parameter value is an integer (e.g., 1), set the default parameter value to a float (e.g., 1.0) when writing the strategy. Otherwise, the strategy will default the parameter to integer, and when [Editing] strategy instance parameters later, only integers will be allowed.
 
-参数配置完成后，点击【添加】按钮，则开始创建策略实例。创建成功后可在左侧的策略监控组件中看到该策略实例。因为每个策略都是独立进程，所以添加成功后图形界面会输出“策略进程启动”的日志，如下图所示：
+After parameter configuration is complete, click the [Add] button to start creating the strategy instance. Upon successful creation, the strategy instance can be seen in the left strategy monitoring component. Since each strategy is an independent process, the graphical interface will output the log "Strategy process started" after successful addition, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/5.png)
 
-策略监控组件顶部显示的是策略实例名、接口名、合约品种名、策略类名以及策略作者名（在策略里定义的author）。顶部按钮用于控制和管理策略实例，第一行表格显示了策略内部的参数信息（参数名需要写在策略的parameters列表中图形界面才会显示），第二行表格则显示了策略运行过程中的变量信息（变量名需要写在策略的variables列表中图形界面才会显示）。【inited】字段表示当前策略的初始化状态（是否已经完成了历史数据回放），【trading】字段表示策略当前是否能够开始交易。
+The top of the strategy monitoring component displays the strategy instance name, interface name, contract variety name, strategy class name, and strategy author name (defined as author in the strategy). The top buttons are used to control and manage the strategy instance. The first row table displays the internal parameter information of the strategy (parameter names need to be written in the strategy's parameters list to be displayed in the graphical interface), and the second row table displays variable information during strategy operation (variable names need to be written in the strategy's variables list to be displayed in the graphical interface). The [inited] field indicates the current initialization status of the strategy (whether historical data playback is completed), and the [trading] field indicates whether the strategy can start trading.
 
-从上图可观察到，此时该策略实例的【inited】和【trading】状态都为【False】。说明该策略实例还没有初始化，也还不能发出交易信号。
+As observed in the figure above, at this point, the [inited] and [trading] states of the strategy instance are both [False]. This indicates that the strategy instance has not been initialized and cannot issue trading signals yet.
 
-策略实例创建成功后，该策略实例的配置信息会被保存到.vntrader文件夹下的cta_strategy_setting.json文件中。
+After successful creation of the strategy instance, its configuration information will be saved to the cta_strategy_setting.json file in the .vntrader folder.
 
+## Initializing Strategy
 
-## 初始化策略
-
-策略实例创建成功后，就可以对该实例进行初始化了。点击该策略实例下的【初始化】按钮，若初始化成功，则如下图所示：
+After successful creation of the strategy instance, it can be initialized. Click the [Initialize] button under the strategy instance. If initialization is successful, it will be as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/6.png)
 
-初始化过程中，主要按顺序完成了以下三步任务：
+During initialization, the following three tasks are completed in sequence:
 
-1. 获取历史数据
+1. Retrieve Historical Data
 
-   为了确保策略内指标数值的准确性，每个策略实例都需要一定的历史数据来进行策略初始化。
+   To ensure the accuracy of indicator values in the strategy, each strategy instance requires a certain amount of historical data for initialization.
 
-   因此，在策略初始化时，策略实例内部的load_bar函数会先去接口获取最新历史数据。如果接口不提供历史数据，则通过配置的数据服务获取（[RQData](https://www.ricequant.com/welcome/purchase?utm_source=vnpy)提供国内期货、股票以及期权的历史数据。RQData的数据服务提供盘中K线更新，即使在9点45分才启动策略，也能获取到之前从9点30开盘到9点45分之间的K线数据，提供给策略进行初始化计算，而不用担心数据缺失的问题）。
+   Therefore, during strategy initialization, the load_bar function inside the strategy instance will first retrieve the latest historical data from the interface. If the interface does not provide historical data, it will be obtained through the configured data service ([RQData](https://www.ricequant.com/welcome/purchase?utm_source=vnpy) provides historical data for domestic futures, stocks, and options. RQData's data service provides intraday K-line updates, so even if the strategy is started at 9:45, it can retrieve K-line data from 9:30 opening to 9:45 for initialization calculations without worrying about data missing).
 
-   具体载入数据的长度，取决于load_bar函数的参数控制（策略模板默认是10天）。数据载入后会以逐根K线（或者Tick）的方式推送给策略，实现内部变量的初始化计算，比如缓存K线序列、计算技术指标等。
+   The specific length of data loaded depends on the load_bar function's parameter control (default is 10 days in the strategy template). After data loading, it will be pushed to the strategy bar by bar (or tick), to initialize internal variables, such as caching K-line sequences, calculating technical indicators, etc.
 
-2. 载入缓存变量
+2. Load Cached Variables
 
-   在每天实盘运行的过程中，量化策略中的有些变量只和历史行情数据相关，这类变量通过加载历史数据回放就能得到正确的数值。另一类变量则可能和交易状态相关，如策略的持仓，这类变量需要缓存在硬盘上（退出程序时），第二天回放完历史数据后再读取还原，才能保证和之前交易状态的一致性。
+   During daily live operation, some variables in quantitative strategies are only related to historical market data, and these can be correctly valued by loading historical data playback. Other variables may be related to trading status, such as strategy positions, which need to be cached on the hard drive (upon program exit), and restored after historical data playback the next day to ensure consistency with previous trading status.
 
-   每次停止策略时，会自动将策略的variables列表对应的变量以及策略持仓缓存进.vntrader目录下的cta_strategy_data.json文件中，以便在下一次策略初始化时自动载入。
+   Each time the strategy is stopped, the variables corresponding to the strategy's variables list and strategy positions will be automatically cached in the cta_strategy_data.json file under the .vntrader directory, for automatic loading during the next strategy initialization.
 
-   请注意，在某些情况下（比如手动平仓了），缓存的数据可能会出现偏差（因为策略持仓维护的是运行策略实例的逻辑持仓，不是特定品种的持仓），那么可以通过手动修改json文件来调整。
+   Note that in some cases (e.g., manual closing), cached data may have discrepancies (because strategy position maintenance is the logical position of the running strategy instance, not the position of a specific variety), which can be adjusted by manually modifying the json file.
 
-3. 订阅行情推送
+3. Subscribe to Market Quotes
 
-   最后基于vt_symbol参数获取该策略所交易合约的信息，并订阅该合约的实时行情推送。如果实盘交易系统找不到该合约的信息，比如没有连接登录接口或者vt_symbol填写错误，则会在日志模块中输出相应的报错信息。
+   Finally, based on the vt_symbol parameter, retrieve the contract information traded by the strategy and subscribe to real-time market quote pushes for that contract. If the live trading system cannot find the contract information, such as not connecting to the login interface or incorrect vt_symbol, corresponding error messages will be output in the log module.
 
-以上三个步骤完成后，可观察到此时该策略实例的【inited】状态已经为【True】，且变量也都显示对应的数值（不再为0）。说明该策略实例已经调用过load_bar函数加载历史数据并完成初始化了。【trading】状态还是为【False】，说明此时该策略实例还不能开始自动交易。
+After completing the above three steps, it can be observed that the [inited] state of the strategy instance is now [True], and variables display corresponding values (no longer 0). This indicates that the strategy instance has called the load_bar function to load historical data and complete initialization. The [trading] state is still [False], indicating that the strategy instance cannot start automated trading yet.
 
-## 启动策略
+## Starting Strategy
 
-策略实例初始化成功，【inited】状态为【True】时，才能启动自动交易功能。点击策略实例下的【启动】按钮，即可启动该策略实例。成功后如下图所示：
+Only when the strategy instance is successfully initialized and the [inited] state is [True] can the automated trading function be started. Click the [Start] button under the strategy instance to start it. Upon success, it will be as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/7.png)
 
-可观察到此时该策略实例的【inited】和【trading】状态都为【True】。说明此时该策略实例已经调用过load_bar函数，完成了历史数据回放，而且此时策略内部的交易请求类函数（buy/sell/short/cover/cancel_order等），以及信息输出类函数（send_email/put_event等），才会真正执行并发出对应的请求指令到底层接口中（真正执行交易）。
+It can be observed that both [inited] and [trading] states of the strategy instance are now [True]. This indicates that the strategy instance has called the load_bar function, completed historical data playback, and now the trading request functions (buy/sell/short/cover/cancel_order, etc.) and information output functions (send_email/put_event, etc.) will actually execute and send corresponding request instructions to the underlying interface (actual trading execution).
 
-在上一步策略初始化的过程中，尽管策略同样在接收（历史）数据，并调用对应的功能函数，但因为【trading】状态为【False】，所以并不会有任何真正的委托下单操作或者交易相关的日志信息输出。
+In the previous strategy initialization step, although the strategy also receives (historical) data and calls corresponding functions, because the [trading] state is [False], there will be no actual order placement operations or trading-related log outputs.
 
-如果启动之后，策略发出了限价单，可以去VeighNa Elite Trader主界面【委托】栏查看委托订单细节。如果策略发出了本地停止单，可以在CTA策略UI界面右上方区域的停止单监控组件查看委托订单细节。
+If the strategy issues limit orders after starting, details can be viewed in the [Orders] section of the VeighNa Elite Trader main interface. If the strategy issues local stop orders, details can be viewed in the stop order monitoring component in the upper-right area of the CTA strategy UI interface.
 
+## Stopping Strategy
 
-## 停止策略
-
-如果启动策略之后，由于某些情况（如到了市场收盘时间，或盘中遇到紧急情况）想要停止、编辑或者移除策略，可以点击策略实例下的【停止】按钮，即可停止该策略实例的自动交易。成功后如下图所示：
+After starting the strategy, if you want to stop, edit, or remove it due to certain situations (e.g., market close or intraday emergencies), click the [Stop] button under the strategy instance to stop automated trading. Upon success, it will be as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/8.png)
 
-CTA策略引擎会自动将该策略之前发出的所有活动委托全部撤销，以保证在策略停止后不会有失去控制的委托存在。同时该策略实例最新的变量信息会被保存到.vntrader文件夹下的cta_strategy_data.json文件中。
+The CTA strategy engine will automatically cancel all active orders issued by the strategy to ensure no uncontrolled orders exist after stopping. At the same time, the latest variable information of the strategy instance will be saved to the cta_strategy_data.json file in the .vntrader folder.
 
-此时可观察到该策略实例的【trading】状态已变为【False】，说明此时该策略实例已经停止自动交易了。
+It can be observed that the [trading] state of the strategy instance has changed to [False], indicating that automated trading has stopped.
 
-在CTA策略的实盘交易过程中，正常情况应该让策略在整个交易时段中都自动运行，尽量不要有额外的暂停重启类操作。对于国内期货市场来说，应该在交易时段开始前，启动策略的自动交易，然后直到收盘后，再关闭自动交易。因为现在CTP夜盘收盘后也会关闭系统，早上开盘前重启，所以夜盘收盘后也需要停止策略，关闭VeighNa Elite Trader了。
+In the live trading process of CTA strategies, under normal circumstances, the strategy should run automatically throughout the trading session, avoiding extra pause and restart operations. For domestic futures markets, automated trading should start before the trading session begins, and close after market close. Since CTP closes the system after night session close and restarts before morning open, strategies need to be stopped after night close, and VeighNa Elite Trader closed.
 
+## Editing Strategy
 
-## 编辑策略
-
-如果创建策略实例之后，想要编辑某个策略实例的参数（若已启动策略，需要先点击策略实例下的【停止】按钮，停止策略），可以点击该策略实例下的【编辑】按钮，会弹出参数编辑对话框，以供修改策略参数。如下图所示：
+After creating a strategy instance, to edit parameters (if started, first click [Stop] to stop), click the [Edit] button under the strategy instance, and the parameter editing dialog will appear for modification, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/9.png)
 
-编辑完策略参数之后，点击下方的【确定】按钮，相应的修改会立即更新在参数表格中，如下图所示：
+After editing parameters, click [Confirm] below, and changes will update immediately in the parameter table, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/10.png)
 
-但是策略实例的交易合约代码无法修改，同时修改完后也不会重新执行初始化操作。也请注意，此时修改的只是.vntrader文件夹下cta_strategy_setting.json文件中该策略实例的参数值，并没有修改原策略文件下的参数。
+However, the trading contract code of the strategy instance cannot be modified, and initialization will not be re-executed after modification. Note that this only modifies the parameter values of the strategy instance in the cta_strategy_setting.json file under .vntrader, not the original strategy file parameters.
 
-若盘中编辑后想要再次启动策略，点击策略实例下的【启动】按钮即可再次启动该策略实例，如下图所示：
+To restart after intraday editing, click [Start] under the strategy instance, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/11.png)
 
+## Removing Strategy
 
-## 移除策略
-
-如果创建策略实例之后，想要移除某个策略实例（若已启动策略，需要先点击策略实例下的【停止】按钮，停止策略），可以点击该策略实例下的【移除】按钮。移除成功后，图形界面左侧的策略监控组件中将不会再显示该策略实例的信息。因为每个策略都是独立进程，所以移除成功后图形界面会输出“策略进程退出”的日志，如下图所示：
+After creating a strategy instance, to remove it (if started, first click [Stop]), click the [Remove] button under the strategy instance. Upon successful removal, the strategy instance information will no longer display in the left strategy monitoring component. Since each strategy is an independent process, the graphical interface will output "Strategy process exited" log after successful removal, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/12.png)
 
-此时.vntrader文件夹下的cta_strategy_setting.json文件也移除了该策略实例的配置信息。
+At this point, the cta_strategy_setting.json file under .vntrader also removes the configuration information of the strategy instance.
 
+## Status Tracking
 
-## 状态跟踪
+To track strategy status via the graphical interface, there are two ways:
 
-如果想要通过图形界面跟踪策略的状态，有两种方式：
+1. Call put_event Function
 
-1. 调用put_event函数
+   All variable information in the strategy instance needs variable names written in the strategy's variables list to display in the graphical interface. To track variable status changes, call the put_event function in the strategy for data refresh on the interface.
 
-   策略实例中所有的的变量信息，都需要把变量名写在策略的variables列表中，才能在图形界面显示。如果想跟踪变量的状态变化，则需要在策略中调用put_event函数，界面上才会进行数据刷新。
+   Sometimes users find that their written strategy variables do not change no matter how long it runs; in this case, check if the call to put_event function is missing in the strategy.
 
-   有时用户会发现自己写的策略无论跑多久，变量信息都不发生变化，这种情况请检查策略中是否漏掉了对put_event函数的调用。
+2. Call write_log Function
 
-2. 调用write_log函数
+   To not only observe variable status changes but also output personalized logs based on strategy status, call the write_log function in the strategy for log output.
 
-   如果不仅想观察到变量信息的状态变化，还想根据策略的状态输出基于自己需求的个性化的日志，可以在策略中调用write_log函数，进行日志输出。
+## Running Logs
 
+### Log Content
 
-## 运行日志
+Logs output on the CTA strategy module UI interface come from two sources: the CTA strategy engine and strategy instances.
 
-### 日志内容
+**Engine Logs**
 
-CTA策略模块UI界面上输出的日志有两个来源，分别是CTA策略引擎和策略实例。
-
-**引擎日志**
-
-CTA策略引擎一般输出的是全局信息。下图中除了以带中括号的策略实例名开头的内容之外，都是CTA策略引擎输出的日志。
+The CTA strategy engine generally outputs global information. In the figure below, except for content starting with the strategy instance name in brackets, all are logs output by the CTA strategy engine.
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/13.png)
 
-**策略日志**
+**Strategy Logs**
 
-如果在策略中调用了write_log函数，那么日志内容就会通过策略日志输出。下图红框里的内容分别是两个不同的策略实例输出的策略日志。中括号里是策略实例的名称，中括号后是write_log函数输出的内容。
+If the write_log function is called in the strategy, log content will be output via strategy logs. The content in the red boxes below are strategy logs output by two different strategy instances. The brackets contain the strategy instance name, followed by the write_log function output.
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/14.png)
 
-### 清空操作
+### Clear Operation
 
-如果想要清空CTA策略UI界面上的日志输出，可以点击右上角的【清空日志】按钮，则可一键清空该界面上已输出的日志。
+To clear logs on the CTA strategy UI interface, click the [Clear Logs] button in the upper-right corner to clear all output logs on the interface with one click.
 
-点击【清空日志】前，如下图所示：
+Before clicking [Clear Logs], as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/12.png)
 
-点击【清空日志】后，如下图所示：
+After clicking [Clear Logs], as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/15.png)
 
+## Stop Orders
 
-## 停止单
+The stop order monitoring component in the upper-right area of the graphical interface is used to track status changes of all local stop orders in the CTA engine.
 
-图形界面右上方区域的停止单监控组件，是用来跟踪所有CTA引擎内本地停止单的状态变化的。
+Since not all interfaces support stop orders, VeighNa provides local stop order functionality. Even if the trading interface does not support exchange stop orders, users can still enable local stop orders by setting the stop parameter to True in the strategy's order functions (buy/sell/short/cover).
 
-因为不是所有接口都支持停止单，所以VeighNa提供了本地停止单的功能。在交易接口不支持交易所停止单的前提下，用户依然可以通过策略的下单函数（buy/sell/short/cover），把stop参数设置为True，启用本地停止单功能。
+VeighNa's local stop orders have three characteristics:
 
-VeighNa的本地停止单有三个特点：
+1. Stored on the local computer, invalid after shutdown;
+2. Only visible to the trader, no worry about leaking cards;
+3. Stop order triggering has delay, causing some slippage.
 
-1. 保存在本地电脑上，关机后则失效；
-2. 只有交易员本人能够看到，不必担心泄露底牌；
-3. 停止单触发有延时，导致一定的滑点。
+**Stop Order Information**
 
-**停止单信息**
+After issuing a local stop order, the monitoring component in the upper-right of the graphical interface will display order details.
 
-在发出本地停止单后，图形界面右上方的监控组件就会显示停止单的委托细节。
-
-本地停止单一共有【等待中】、【已触发】和【已撤销】三个状态，如下图所示：
+Local stop orders have three states: [Pending], [Triggered], and [Cancelled], as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/19.png)
 
-停止单刚发出时是处于【等待中】的状态。因为停止单的信息记录在本地，没有发往交易所，所以此时主界面上【委托】栏不会有变化。
+When first issued, the stop order is in [Pending] state. Since stop order information is recorded locally and not sent to the exchange, the [Orders] section on the main interface will not change.
 
-一旦该停止单的委托价格被触发，为了实现立即成交的目的，CTA策略引擎会立即以**涨跌停价**或者**盘口五档**的价格，去发出**限价**委托（所以建议本地停止单只用于流动性较好的合约）。限价委托发出后，VeighNa Elite Trader主界面上【委托】栏将更新该订单的状态，此时停止单状态会变为【已触发】，【限价委托号】栏下也会填入该订单的限价委托号。
+Once the stop order's trigger price is hit, to achieve immediate execution, the CTA strategy engine will immediately issue a **limit** order at **limit up/down price** or **best five levels** price (suggest using local stop orders only for contracts with good liquidity). After issuing the limit order, the [Orders] section on the VeighNa Elite Trader main interface will update the order status, the stop order state will change to [Triggered], and the [Limit Order ID] column will fill in the limit order ID.
 
-请注意，**停止单界面显示的价格是本地停止单的触发价格，而不是发出限价单的价格**。
+Note that **the price displayed on the stop order interface is the local stop order trigger price, not the limit order price issued**.
 
-如果停止单在被触发前就被策略取消了，那么该订单的状态就会变为【已撤销】。
+If the stop order is cancelled by the strategy before triggering, the order status will change to [Cancelled].
 
+## Batch Operations
 
-## 批量操作
+When strategies are fully tested, stable in live operation, and do not require frequent adjustments, if multiple CTA strategy instances need to run, use the [Initialize All], [Start All], and [Stop All] functions in the upper-right corner of the interface for pre-market batch initialization, starting, and post-market batch stopping.
 
-在策略经过充分测试，实盘运行较为稳定，不需要经常进行调整的情况下，如果有多个需要运行的CTA策略实例，可以使用界面右上角的【全部初始化】、【全部启动】和【全部停止】功能来执行盘前批量初始化、启动策略实例以及盘后批量停止策略实例的操作。
+## Manual Contract Rollover
 
-
-## 手动换月移仓
-
-如需使用自动移仓助手，请在策略初始化之前，点击CTA策略UI界面右上角的【移仓助手】按钮，则会弹出移仓助手界面，如下图所示：
+To use the automatic rollover assistant, before strategy initialization, click the [Rollover Assistant] button in the upper-right corner of the CTA strategy UI interface, and the rollover assistant interface will appear, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/20.png)
 
-若策略已经初始化，则打开界面时，移仓助手界面左下角会输出“策略已经初始化，无法执行移仓”的信息，如下图所示：
+If the strategy is already initialized, upon opening, the lower-left corner of the rollover assistant interface will output "Strategy already initialized, cannot perform rollover," as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/21.png)
 
-成功打开移仓助手界面之后，点击【刷新】按钮即可看到当前CTA策略模块下所有策略实例所交易的合约信息，如下图所示：
+After successfully opening the rollover assistant interface, click [Refresh] to see contract information traded by all strategy instances under the current CTA strategy module, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/22.png)
 
-此时就可以配置要执行的移仓任务了，其中：
+Now configure the rollover tasks to execute, where:
 
-- 移仓合约：填入需要将老的仓位和策略，移仓过去的新合约的本地代码（vt_symbol）；
-- 多头移仓：合约多头需要移仓的数量（不能大于显示的账户总多持仓）；
-- 空头移仓：合约空头需要移仓的数量（不能大于显示的账户总空持仓）；
-- 单笔上限：算法移仓时单笔委托的手数上限；
-- 委托超价：算法移仓时委托价格相对于当时盘口对价超出的pricetick。
+- Rollover Contract: Enter the local code (vt_symbol) of the new contract to rollover old positions and strategies to;
+- Long Rollover: Number of long positions to rollover (cannot exceed displayed total long account position);
+- Short Rollover: Number of short positions to rollover (cannot exceed displayed total short account position);
+- Single Order Limit: Upper limit of lots per order during algorithmic rollover;
+- Order Overprice: Order price overprice pricetick relative to current best opposite price during algorithmic rollover.
 
-完成配置确认无误后，点右上角击【执行移仓】按钮，会弹出【执行移仓确认】窗口，如下图所示：
+After configuration confirmation, click [Execute Rollover] in the upper-right, and the [Execute Rollover Confirmation] window will appear, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/23.png)
 
-点击【OK】开始执行，移仓过程中，界面左下角会有移仓相关信息输出，右下角会有移仓算法的显示，完成后移仓助手的上半部分会被设为锁死（变灰无法再点击），如下图所示：
+Click [OK] to start execution. During rollover, the lower-left corner will output rollover-related information, and the lower-right will display the rollover algorithm. After completion, the upper half of the rollover assistant will be locked (grayed out, unclickable), as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/24.png)
 
-可以看到几乎1秒内就完成了移仓合约对应的全部仓位和策略的移仓操作。
+It can be seen that the rollover of all positions and strategies for the rollover contract was completed in almost 1 second.
 
-因为执行完移仓之后界面的上半部分被锁死了，如果需要查看新的可移仓合约的信息或者想进行新一轮移仓（可以分合约执行移仓，也可以先配置好所有的移仓合约，再点击【执行持仓】一次性进行所有策略的移仓），可以点击【刷新】按钮对界面进行刷新。刷新之后会发现“平仓合约”已经变成了刚刚移仓成功的合约的名字。
+Since the upper half of the interface is locked after rollover, to view new rollover-able contract information or perform a new round of rollover (can execute rollover per contract or configure all rollover contracts first, then click [Execute Positions] to rollover all strategies at once), click [Refresh] to refresh the interface. After refresh, the "Close Contract" will change to the name of the just successfully rolled over contract.
 
-
-请注意：
-  1. - 如果将移仓合约填成了平仓合约一致的合约，点击【执行移仓】按钮之后会弹出【执行移仓失败】窗口，并输出“移仓合约和平仓合约不能一样”的信息，如下图所示：
+Note:
+  1. - If the rollover contract is filled as the same as the close contract, clicking [Execute Rollover] will pop up [Execute Rollover Failed] window with "Rollover contract and close contract cannot be the same," as shown below:
 
        ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/25.png)
 
-     - 如果将移仓合约填成了其他品种的合约或者填错了交易所，点击【执行移仓】按钮之后也会弹出【执行移仓失败】窗口，并输出“移仓合约和平仓合约品种不一致”的信息，如下图所示：
+     - If the rollover contract is filled as another variety or wrong exchange, clicking [Execute Rollover] will also pop up [Execute Rollover Failed] window with "Rollover contract and close contract varieties inconsistent," as shown below:
 
        ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/26.png)
 
-  2. 在执行移仓算法的过程中（还未完成），可以点击界面右下角算法监控部分的【停止】按钮来终止某个移仓算法的执行。但是算法停止后会有瘸腿风险（平仓合约与移仓合约移仓结果不一致）；
+  2. During algorithmic rollover execution (not completed), click [Stop] in the algorithm monitoring part in the lower-right to terminate a rollover algorithm. But after stopping, there is a risk of imbalance (inconsistent rollover results between close and rollover contracts);
 
-  3. 即使平仓合约的可移仓持仓为0，也需要填写移仓合约的名字进行移仓。
+  3. Even if the rollover-able position for the close contract is 0, still need to fill the rollover contract name for rollover.
 
-### 移仓过程
+### Rollover Process
 
-移仓助手组件根据配置的移仓信息订阅移仓合约的行情，并启动对应的移仓算法进行委托。移仓的价格为当时的盘口对价加上或减去超价pricetick, 数量为配置的移仓数量（不超过配置的单笔上限）。算法结束之后再更新策略交易代码并移除之前的策略实例。
+The rollover assistant component subscribes to rollover contract quotes based on configured rollover information and starts corresponding rollover algorithms for orders. The rollover price is the current best opposite price plus or minus overprice pricetick, quantity is configured rollover quantity (not exceeding single order limit). After algorithm ends, update strategy trading code and remove previous strategy instance.
 
-### 移仓效果
+### Rollover Effect
 
-回到CTA策略模块的UI界面，可以发现对应策略的交易合约名字已经变了。
+Back to the CTA strategy module UI interface, the trading contract name of the corresponding strategy has changed.
 
-移仓前如下图所示：
+Before rollover, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/27.png)
 
-移仓成功后如下图所示：
+After successful rollover, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/28.png)
 
-回到VeighNa Elite Trader主界面，也可以查看到详细的移仓委托和成交记录。
+Back to VeighNa Elite Trader main interface, detailed rollover orders and trades can also be viewed.
 
+## Multi-Account Support
 
-## 多账户支持
+### Loading
 
-### 加载
+The CTA strategy module supports multi-account batch order trading.
 
-CTA策略模块提供了多账户批量下单交易支持。
+Taking logging into **CTP** interface as example, in the [Trading Interface] tab below the login interface, select CTP interface in the dropdown. Fill custom interface name (e.g., "CTP1", "CTP2") in "Custom Interface," click [Add], fill sub-account configuration, click [Confirm] to load corresponding account interfaces sequentially.
 
-以登录**CTP**接口为例，在登录界面下方的【交易接口】标签页的下拉框中先选中CTP接口。在“自定义接口”处填写自定义的接口名（例如“CTP1”、“CTP2”）之后点击【添加】按钮，填写子账户的配置信息，点击【确定】按钮，则可依次加载对应账户的接口。
+After adding, click [Login] on login interface to log into VeighNa Elite Trader. In menu bar, click [System] -> [Connect xxx] sequentially (xxx is custom interface name, if "CTP1" filled, menu shows [Connect CTP1]), to connect sub-account interface.
 
-添加完毕后，点击登录界面的【登录】按钮登录VeighNa Elite Trader。在菜单栏中依次点击【系统】->【连接xxx】（xxx是自定义的接口名，若加载时填写的“CTP1”，则菜单栏中显示的就是【连接CTP1】），即可连接子账户接口。
+After successful connection, VeighNa Elite Trader main interface [Log] component will output login-related information immediately, and users can see corresponding account information, position information, etc.
 
-连接成功以后，VeighNa Elite Trader主界面【日志】组件会立刻输出登录相关信息，同时用户也可以看到对应的账号信息，持仓信息等相关信息。
+### CTA Strategy Module Batch Ordering
 
-### CTA策略模块批量下单
-
-若需通过CTA策略模块进行批量委托，可在CTA策略模块图形界面【添加策略】时点击【gateway_name】的下拉框选中接口进行指定，如下图所示：
+To batch order via CTA strategy module, when [Add Strategy] on CTA strategy module graphical interface, click [gateway_name] dropdown to select interface, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/16.png)
 
-策略添加成功后，可以在左侧的策略监控组件中看到策略实例的信息，如下图所示：
+After successful strategy addition, strategy instance information can be seen in left strategy monitoring component, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/17.png)
 
-策略实例发出委托后，可在VeighNa Elite Trader主界面【委托】组件和【成交】组件上跟踪到根据对应接口下单的委托，如下图所示：
+After strategy instance issues orders, track orders placed by corresponding interface in [Orders] and [Trades] components on VeighNa Elite Trader main interface, as shown below:
 
 ![](https://vnpy-doc.oss-cn-shanghai.aliyuncs.com/elite/ctastrategy/18.png)
 
-**请注意**：
- - 目前支持同时登录最多登录5个交易账户
+**Note**:
+ - Currently supports logging in up to 5 trading accounts simultaneously.
 
+## CTA Strategy Templates
 
-## CTA策略模板
+CTA strategy templates provide signal generation and order management functions, allowing users to develop CTA strategies based on templates.
 
-CTA策略模板提供了信号生成和委托管理功能，用户可以基于模板自行开发CTA策略。
+User-developed strategies can be placed in the [strategies](#jump) folder under the user runtime folder.
 
-用户自行开发的策略可以放在用户运行文件夹下的[strategies](#jump)文件夹内。
+Note:
+   - Strategy file naming uses underscore mode, e.g., rumi_strategy.py, while strategy class naming uses camel case, e.g., RumiStrategy;
 
-请注意：
-   - 策略文件命名采用下划线模式，如rumi_strategy.py，而策略类命名采用驼峰式，如RumiStrategy；
-
-   - 自建策略的类名不要与示例策略的类名重合。如果重合了，图形界面上只会显示一个策略类名。
+   - Custom strategy class names should not duplicate example strategy class names. If duplicated, the graphical interface will only display one strategy class name.
 
 ### CtaTemplate
 
-VeighNa Elite Trader对vnpy_ctastrategy自带的CtaTemplate提供兼容支持，通过CtaTemplate开发的策略也可在VeighNa Elite Trader的CTA策略模块上成功运行。
+VeighNa Elite Trader provides compatibility support for vnpy_ctastrategy's built-in CtaTemplate. Strategies developed via CtaTemplate can also run successfully on VeighNa Elite Trader's CTA strategy module.
 
 ### EliteCtaTemplate
 
-VeighNa Elite Trader的CTA策略模块提供了EliteCtaTemplate专业CTA策略模板，实现更加强大的CTA策略开发。
+VeighNa Elite Trader's CTA strategy module provides the EliteCtaTemplate professional CTA strategy template for more powerful CTA strategy development.
 
-下面通过RumiStrategy策略示例，来展示策略开发的具体步骤：
+The following uses the RumiStrategy example to demonstrate the specific steps for strategy development:
 
-在基于EliteCtaTemplate编写策略逻辑之前，需要在策略文件的顶部载入需要用到的内部组件，如下方代码所示：
+Before writing strategy logic based on EliteCtaTemplate, load required internal components at the top of the strategy file, as shown in the code below:
 
 ```python3
 from numpy import ndarray
@@ -384,164 +368,164 @@ from elite_ctastrategy import (
 )
 ```
 
-其中：
-* EliteCtaTemplate是Veighna Elite Trader提供的CTA策略模板
-* HistoryManager是Veighna Elite Trader提供的储存历史数据的容器
-* Parameter是储存策略参数的数据容
-* Variable是储存策略变量的数据容器
-* sma，wms，cross_over和cross_below都是内置的计算函数（完整计算函数列表可参考内置指标计算函数篇）
-* ndarray是给on_history函数中计算出来的结果做类型声明的类。
+Where:
+* EliteCtaTemplate is the CTA strategy template provided by Veighna Elite Trader
+* HistoryManager is the container for storing historical data provided by Veighna Elite Trader
+* Parameter is the data container for storing strategy parameters
+* Variable is the data container for storing strategy variables
+* sma, wma, cross_over, and cross_below are built-in calculation functions (for a complete list of calculation functions, refer to the built-in indicator calculation functions section)
+* ndarray is the class for type declaration of results calculated in the on_history function.
 
-### 策略参数与变量
+### Strategy Parameters and Variables
 
-在策略类的下方，可以设置策略的作者（author），参数（parameters）以及变量（variables），如下方代码所示：
+Below the strategy class, set the strategy author (author), parameters (parameters), and variables (variables), as shown in the code below:
 
 ```python3
 
-    author = "VeighNa菁英版"
+    author = "VeighNa Elite Edition"
 
-    # 基础参数（必填）
-    bar_window: int = Parameter(30)             # K线窗口
-    bar_interval: int = Parameter("1m")         # K线级别
-    bar_buffer: int = Parameter(100)            # K线缓存
+    # Basic Parameters (Required)
+    bar_window: int = Parameter(30)             # K-line window
+    bar_interval: int = Parameter("1m")         # K-line interval
+    bar_buffer: int = Parameter(100)            # K-line buffer
 
-    # 策略参数（可选）
-    fast_window: int = Parameter(3)             # 快速均线窗口
-    slow_window: int = Parameter(50)            # 慢速均线窗口
-    rumi_window: int = Parameter(30)            # 均线偏差窗口
-    max_holding: int = Parameter(100)           # 最长持仓周期
-    stop_percent: float = Parameter(0.03)       # 保守止损比例
-    risk_window: int = Parameter(10)            # 风险计算窗口
-    risk_capital: int = Parameter(1_000_000)    # 交易风险投入
-    price_add: int = Parameter(5)               # 委托下单超价
+    # Strategy Parameters (Optional)
+    fast_window: int = Parameter(3)             # Fast moving average window
+    slow_window: int = Parameter(50)            # Slow moving average window
+    rumi_window: int = Parameter(30)            # Moving average deviation window
+    max_holding: int = Parameter(100)           # Maximum holding period
+    stop_percent: float = Parameter(0.03)       # Conservative stop loss percentage
+    risk_window: int = Parameter(10)            # Risk calculation window
+    risk_capital: int = Parameter(1_000_000)    # Trading risk capital
+    price_add: int = Parameter(5)               # Order price addition
 
-    # 策略变量
-    trading_size: int = Variable(1)             # 当前委托数量
-    rumi_0: float = Variable(0.0)               # RUMI当前数值
-    rumi_1: float = Variable(0.0)               # RUMI上期数值
+    # Strategy Variables
+    trading_size: int = Variable(1)             # Current order quantity
+    rumi_0: float = Variable(0.0)               # Current RUMI value
+    rumi_1: float = Variable(0.0)               # Previous RUMI value
 
 ```
 
-虽然策略的参数和变量都从属于策略类，但策略参数是固定的（由交易员从外部指定），而策略变量则在交易的过程中随着策略的状态而变化，所以策略变量一开始只需要初始化为对应的基础类型。例如：整数设为0，浮点数设为0.0。
+Although strategy parameters and variables belong to the strategy class, parameters are fixed (specified externally by the trader), while variables change with strategy status during trading, so variables only need to be initialized to corresponding basic types initially. For example: integers set to 0, floats to 0.0.
 
-如果需要CTA引擎在运行过程中，将策略参数和变量显示在UI界面上，并在数据刷新、停止策略时保存其数值，则需在创建策略类的时候创建对应的参数和变量实例。
+To have the CTA engine display strategy parameters and variables on the UI during operation and save their values on data refresh or strategy stop, create corresponding parameter and variable instances when creating the strategy class.
 
-请注意：
- - Parameter容器和Variable容器只能接受参数或变量以str、int、float和bool四种数据类型传入；
+Note:
+ - Parameter and Variable containers only accept parameters or variables in str, int, float, and bool types;
 
- - 每个通过EliteCtaTemplate开发的策略，都需要创建bar_window（K线窗口）、bar_interval（K线级别 - 目前只支持"1m"和"1h"）以及bar_buffer（历史数据容器HistoryManager的K线缓存长度）这三个基础参数；
+ - Every strategy developed via EliteCtaTemplate needs to create three basic parameters: bar_window (K-line window), bar_interval (K-line interval - currently only supports "1m" and "1h"), and bar_buffer (K-line buffer length for HistoryManager);
 
- - 当bar_interval为"1m"时，bar_window必须设为能被60整除的数（60除外）。当bar_interval为"1h"时则没有这个限制。
+ - When bar_interval is "1m", bar_window must be a number divisible by 60 (excluding 60). When bar_interval is "1h", there is no such restriction.
 
-### 策略的回调函数
+### Strategy Callback Functions
 
-EliteCtaTemplate中以on开头的函数称为回调函数，在编写策略的过程中能够用来接收数据或者接收状态更新。回调函数的作用是当某一个事件发生的时候，策略里的这类函数会被CTA策略引擎自动调用（无需在策略中主动操作）。回调函数按其功能可分为以下三类：
+Functions starting with on in EliteCtaTemplate are callback functions, used to receive data or status updates during strategy writing. The role of callback functions is to be automatically called by the CTA strategy engine when an event occurs (no need to actively operate in the strategy). Callback functions can be divided into three categories by function:
 
-#### 策略实例状态控制（所有策略都需要）
+#### Strategy Instance Status Control (Required for All Strategies)
 
 **on_init**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-初始化策略时on_init函数会被调用，默认写法是先调用write_log函数输出“策略初始化”日志，再调用load_bar函数加载历史数据，如下方代码所示：
+The on_init function is called during strategy initialization. Default implementation calls write_log to output "Strategy initialization" log, then calls load_bar to load historical data, as shown in the code below:
 
 ```python3
     def on_init(self) -> None:
-        """初始化"""
-        self.write_log("策略初始化")
+        """Initialization"""
+        self.write_log("Strategy initialization")
         self.load_bar(10)
 ```
 
-策略初始化时，策略的inited和trading状态都为【False】，此时只是调用历史数据管理器计算并缓存相关的计算指标，不能发出交易信号。调用完on_init函数之后，策略的inited状态才变为【True】，策略初始化才完成。
+During strategy initialization, both inited and trading states are [False], only calculating and caching related indicators with historical data manager, cannot issue trading signals. After calling on_init, inited state becomes [True], completing initialization.
 
 **on_start**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-启动策略时on_start函数会被调用，默认写法是调用write_log函数输出“策略启动”日志，如下方代码所示：
+The on_start function is called when starting the strategy. Default implementation calls write_log to output "Strategy started" log, as shown below:
 
 ```python3
     def on_start(self):
         """
         Callback when strategy is started.
         """
-        self.write_log("策略启动")
+        self.write_log("Strategy started")
 ```
 
-调用策略的on_start函数启动策略后，策略的trading状态变为【True】，此时策略才能够发出交易信号。
+After calling on_start to start, trading state becomes [True], allowing trading signals.
 
 **on_stop**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-停止策略时on_stop函数会被调用，默认写法是调用write_log函数输出“策略停止”日志，如下方代码所示：
+The on_stop function is called when stopping the strategy. Default implementation calls write_log to output "Strategy stopped" log, as shown below:
 
 ```python3
     def on_stop(self):
         """
         Callback when strategy is stopped.
         """
-        self.write_log("策略停止")
+        self.write_log("Strategy stopped")
 ```
 
-调用策略的on_stop函数停止策略后，策略的trading状态变为【False】，此时策略就不会发出交易信号了。
+After calling on_stop, trading state becomes [False], no trading signals issued.
 
-#### 接收数据、计算指标、发出交易信号
+#### Receiving Data, Calculating Indicators, Issuing Trading Signals
 
 **on_history**
 
-* 入参：hm: HistoryManager
+* Input: hm: HistoryManager
 
-* 出参：无
+* Output: None
 
-一旦策略的[历史数据管理器HistoryManager](#jump2)初始化完成之后，当策略收到最新的K线数据时，on_history函数就会被调用。
+Once the strategy's [HistoryManager](#jump2) initialization is complete, on_history is called when receiving latest K-line data.
 
-示例策略类RumiStrategy是通过30分钟K线数据回报来生成CTA信号的。一共有三部分，如下方代码所示：
+The example strategy class RumiStrategy generates CTA signals via 30-minute K-line data returns. It has three parts, as shown in the code below:
 
 ```python3
     def on_history(self, hm: HistoryManager) -> None:
-        """K线推送"""
-        # 计算均线数组
+        """K-line push"""
+        # Calculate moving average arrays
         fast_array: ndarray = sma(hm.close, self.fast_window)
         slow_array: ndarray = wma(hm.close, self.slow_window)
 
-        # 计算均线差值
+        # Calculate moving average difference
         diff_array: ndarray = fast_array - slow_array
         rumi_array: ndarray = sma(diff_array, self.rumi_window)
 
         self.rumi_0 = rumi_array[-1]
         self.rumi_1 = rumi_array[-2]
 
-        # 判断上下穿
+        # Determine crossovers
         long_signal: bool = cross_over(rumi_array, 0)
         short_signal: bool = cross_below(rumi_array, 0)
 
-        # 计算交易数量
+        # Calculate trading quantity
         self.trading_size = self.calculate_volume(self.risk_capital, self.risk_window, 1000, 1)
 
-        # 获取当前目标
+        # Get current target
         last_target: int = self.get_target()
 
-        # 初始化新一轮目标（默认不变）
+        # Initialize new target (default unchanged)
         new_target: int = last_target
 
-        # 执行开仓信号
+        # Execute open signals
         if long_signal:
             new_target = self.trading_size
         elif short_signal:
             new_target = -self.trading_size
 
-        # 持仓时间平仓
+        # Close on holding time
         if self.bar_since_entry() >= self.max_holding:
             new_target = 0
 
-        # 保护止损平仓
+        # Protective stop loss close
         close_price = hm.close[-1]
 
         if last_target > 0:
@@ -553,529 +537,526 @@ EliteCtaTemplate中以on开头的函数称为回调函数，在编写策略的�
             if close_price >= stop_price:
                 new_target = 0
 
-        # 设置新一轮目标
+        # Set new target
         self.set_target(new_target)
 
-        # 执行目标交易
+        # Execute target trading
         self.execute_trading(self.price_add)
 
-        # 推送UI更新
+        # Push UI update
         self.put_event()
 ```
 
-- 信号计算：通过收到的最新HistoryManager实例获取的K线数据来计算相应的技术指标。如均线数组和均线差值等。首先获取需要的数组，然后通过内置的指标计算函数进行计算；
+- Signal Calculation: Calculate technical indicators using K-line data from latest HistoryManager instance. Such as moving average arrays and differences. First get needed arrays, then calculate via built-in indicator functions;
   
-   请注意，示例策略中的cross_over和cross_below函数是计算传入指标是否上穿（指标上一个值小于等于指定数值以及指标最新值大于指定数值）和下穿（指标上一个值大于等于指定数值以及指标最新值小于指定数值）的布尔函数。
+   Note, cross_over and cross_below in the example are boolean functions checking if the indicator crosses above (previous value <= specified, latest > specified) or below (previous >= specified, latest < specified).
 
-- 设置目标：计算完技术指标后，调用calculate_volume函数计算委托数量。然后基于get_target函数获取的当前目标对新一轮目标进行初始化。之后可以基于指标的数值和策略的状态设置新一轮目标；
+- Set Target: After calculating indicators, call calculate_volume to compute order quantity. Then initialize new target based on current target from get_target. Set new target based on indicator values and strategy status;
   
-   以RumiStrategy为例，通过long_signal/short_signal设置开仓信号，平仓则通过持仓时间和保护止损两方面设置。
+   For RumiStrategy, long_signal/short_signal set open signals, close via holding time and protective stop loss.
 
-   当策略的当前目标last_target为0时，策略的开仓后经历过的K线周期数也为0，所以都不会触发平仓条件，条件满足时只会发出开仓信号。当策略的当前目标last_target不为0时，若新的信号与之前开仓的信号是一个方向，则新一轮目标与当前目标保持一致，执行交易时不会委托下单。若触发了平仓条件，则会将新一轮目标设为0，执行交易时进行平仓。若新的信号与之前开仓的信号不是一个方向，则会设置该信号为新一轮目标，执行时进行委托。
+   When current target last_target is 0, bar_since_entry is 0, so no close conditions trigger, only open signals if conditions met. When last_target != 0, if new signal same direction, new target same as current, no order on execution. If close triggered, set new target to 0, close on execution. If new signal opposite, set as new target, order on execution.
 
-   请注意，在所有设置新一轮目标的逻辑之后，执行目标交易之前，通过set_target函数设置策略目标是为了避免在同一根K线里进行多次设置操作。
+   Note, after all set new target logic, before execute target trading, set strategy target via set_target to avoid multiple sets in same K-line.
 
-- 执行目标交易：设置好新一轮目标之后，直接执行目标交易并推送UI更新。
+- Execute Target Trading: After setting new target, directly execute target trading and push UI update.
 
-   请注意，如果需要在图形界面刷新指标数值，请不要忘记调用put_event()函数。
+   Note, to refresh indicator values on graphical interface, do not forget to call put_event().
 
-#### 委托状态更新
+#### Order Status Updates
 
-以下函数在策略中可以直接pass，其具体逻辑应用交给回测/实盘引擎负责。请注意，**不要在这类函数中下达委托指令**。
+The following functions can be passed directly in the strategy, with specific logic handled by backtest/live engines. Note, **do not issue order instructions in these functions**.
 
 **on_trade**
 
-* 入参：bar: TradeData
+* Input: bar: TradeData
 
-* 出参：无
+* Output: None
 
-收到策略成交回报时on_trade函数会被调用。
+on_trade is called on strategy trade returns.
 
 **on_order**
 
-* 入参：bar: OrderData
+* Input: bar: OrderData
 
-* 出参：无
+* Output: None
 
-收到策略委托回报时on_order函数会被调用。
+on_order is called on strategy order returns.
 
-### 主动函数
+### Active Functions
 
 <span id="jump1">
 
-EliteCtaTemplate内置了一套缓存策略理论成交记录的方案。在主动函数中，除了execute_trading函数中计算仓差时是基于策略目标和策略仓位差别来计算之外，其他部分都是由策略的理论目标来控制的。
+EliteCtaTemplate has a built-in scheme for caching strategy theoretical trade records. In active functions, except for calculate position difference in execute_trading based on strategy target and position difference, other parts are controlled by strategy theoretical targets.
 
 **set_target**
 
-* 入参：target: int
+* Input: target: int
 
-* 出参：无
+* Output: None
 
-set_target是用来设置策略目标净仓位的函数（可以理解为想要指定的策略持仓量）。正数代表做多、负数代表做空。
+set_target sets strategy target net position (understood as desired strategy position quantity). Positive for long, negative for short.
 
-请注意，目标仓位是一种持续性的状态，因此设置后在后续时间会持续保持下去，直到被再次设置修改。
+Note, target position is persistent state, remains until reset.
 
 **get_target**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-get_target是用来查询策略目标仓位的函数。
+get_target queries strategy target position.
 
 **execute_trading**
 
-* 入参：price_add: float
+* Input: price_add: float
 
-* 出参：无
+* Output: None
 
-execute_trading是基于设定的目标仓位用来执行交易的函数。委托下单和撤单已经被该函数接管，无需再在策略内进行下单和撤单操作。
+execute_trading executes trading based on set target position. Order placement and cancellation managed by this function, no need in strategy.
 
-execute_trading被调用之后，在函数内部会先撤销策略所有活动委托，然后根据策略目标和策略持仓的仓差（没有则不委托）进行委托。
+After calling execute_trading, internally cancels all active strategy orders, then orders based on target and position difference (no order if none).
 
 **calculate_volume**
 
-* 入参：risk_capital: float, risk_window: int, max_volume = 0, min_volume: int = 0
+* Input: risk_capital: float, risk_window: int, max_volume = 0, min_volume: int = 0
 
-* 出参：trading_size: int
+* Output: trading_size: int
 
-calculate_volume是用来计算风险调整后的委托数量的函数。
+calculate_volume calculates risk-adjusted order quantity.
 
-risk_capital是用来计算风险调整后的委托数量的资金，risk_window是用来计算风险水平的K线周期窗口，max_volume和min_volume是限制委托数量的最大值和最小值。
+risk_capital is capital for risk-adjusted quantity, risk_window is K-line period window for risk level, max_volume and min_volume limit max/min order quantity.
 
-请注意，**risk_window的长度不能超过HistoryManager容器的长度bar_buffer**。
+Note, **risk_window length cannot exceed HistoryManager container length bar_buffer**.
 
 **bar_since_entry**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-bar_since_entry函数是用来获取内置交易管理器里维护的开仓后经历过的K线周期数（理论值）的函数。
+bar_since_entry gets K-line periods (theoretical) since open maintained by built-in trade manager.
 
 **long_average_price**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-long_average_price函数是用来获取内置交易管理器里维护的多头持仓均价（理论值）的函数。
+long_average_price gets long average price (theoretical) maintained by built-in trade manager.
 
 **short_average_price**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-short_average_price函数是用来获取内置交易管理器里维护的空头持仓均价（理论值）的函数。
+short_average_price gets short average price (theoretical) maintained by built-in trade manager.
 
 **get_account_pos**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-get_account_pos函数用于获取该策略（合约代码、交易接口）对应的底仓账户持仓，返回值为净仓数据（即多仓减去空仓的数值）。
+get_account_pos gets base account position for strategy (contract code, trading interface), returns net position (long minus short).
 
 **get_pricetick**
 
-* 入参：无
+* Input: None
 
-* 出参：pricetick: float / None
+* Output: pricetick: float / None
 
-在策略中调用get_pricetick函数，可以获取交易合约的最小价格跳动。
+Call get_pricetick in strategy to get trading contract minimum price tick.
 
 **get_size**
 
-* 入参：无
+* Input: None
 
-* 出参：size: int / None
+* Output: size: int / None
 
-在策略中调用get_size函数，可以获取交易合约的合约乘数。
+Call get_size in strategy to get trading contract size multiplier.
 
 **get_account**
 
-* 入参：无
+* Input: None
 
-* 出参：size: AccountData / None
+* Output: size: AccountData / None
 
-在策略中调用get_account函数，可以获取交易合约的账户资金。
+Call get_account in strategy to get trading contract account balance.
 
 </span>
 
-### 功能函数
+### Utility Functions
 
-以下为策略以外的功能函数：
+The following are utility functions outside the strategy:
 
 **write_log**
 
-* 入参：msg: str
+* Input: msg: str
 
-* 出参：无
+* Output: None
 
-在策略中调用write_log函数，可以进行指定内容的日志输出。
+Call write_log in strategy for specified log output.
 
 **load_bar**
 
-* 入参：days: int, interval: Interval = Interval.MINUTE, callback: Callable = None, use_database: bool = False
+* Input: days: int, interval: Interval = Interval.MINUTE, callback: Callable = None, use_database: bool = False
 
-* 出参：无
+* Output: None
 
-在策略中调用load_bar函数，可以在策略初始化时加载K线数据。
+Call load_bar in strategy to load K-line data during initialization.
 
-如下方代码所示，调用load_bar函数时，默认加载的天数是10，频率是一分钟，对应也就是加载10天的1分钟K线数据，建议加载的天数宁可多一些也不要太少。use_database参数默认为False，会先依次尝试通过交易接口、数据服务获取历史数据，直到获取历史数据或返回空。
+As shown below, default loads 10 days, interval minute, i.e., 10 days 1-min K-lines, suggest loading more rather than less. use_database default False, tries trading interface, data service sequentially until data or empty.
 
 **put_event**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-在策略中调用put_event函数，可以通知图形界面刷新策略状态相关显示。
+Call put_event in strategy to notify graphical interface to refresh strategy status display.
 
-请注意，要策略初始化完成，inited状态变为【True】之后，才能刷新界面。
+Note, only after initialization complete, inited [True], can refresh.
 
 **send_email**
 
-* 入参：msg: str
+* Input: msg: str
 
-* 出参：无
+* Output: None
 
-配置好邮箱相关信息之后，在策略中调用send_email函数，可以发送指定内容的邮件到自己的邮箱。
+After email configuration, call send_email in strategy to send specified content to email.
 
-请注意，要策略初始化完成，inited状态变为【True】之后，才能发送邮件。
+Note, only after initialization complete, inited [True], can send.
 
 **sync_data**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-在策略中调用sync_data函数，可以在实盘交易的时候，每次停止时都同步策略变量到对应json文件中进行本地缓存，方便第二天初始化时再进行读取还原（CTA策略引擎会去调用，在策略里无需主动调用）。
+Call sync_data in strategy to sync variables to json file on live stop for cache, for next day init restore (CTA engine calls, no need in strategy).
 
-请注意：
-   - 要在策略启动之后，也就是策略的trading状态变为【True】之后，才能同步策略信息；
+Note:
+   - Only after start, trading [True], can sync;
 
-   - 基于EliteCtaTemplate开发的策略，只有策略的持仓pos会被同步到本地，其他策略变量由理论值维护。
+   - For EliteCtaTemplate strategies, only position pos synced locally, other variables by theoretical values.
 
 ### EliteTargetTemplate
 
-VeighNa Elite Trader的CTA策略模块提供了EliteTargetTemplate专业CTA策略模板，实现更加强大的CTA策略开发。
+VeighNa Elite Trader's CTA strategy module provides EliteTargetTemplate professional CTA strategy template for more powerful CTA strategy development.
 
-下面对EliteTargetTemplate的函数进行介绍。
+Below introduces functions of EliteTargetTemplate.
 
-### 策略参数与变量
+### Strategy Parameters and Variables
 
-在策略类的下方，可以设置策略的作者（author），参数（parameters）以及变量（variables）。
+Below strategy class, set author (author), parameters (parameters), variables (variables).
 
-### 类的初始化
+### Class Initialization
 
-__init__函数是策略类的构造函数，需要与继承的EliteTargetTemplate保持一致。
+__init__ is strategy class constructor, consistent with inherited EliteTargetTemplate.
 
-在这个继承的策略类里，初始化一般分三步：
+In this inherited class, init generally three steps:
 
-1 . 通过super( )的方法继承CTA策略模板，在__init__( )函数中传入CTA引擎、策略名称、vt_symbol以及参数设置。注意其中的CTA引擎，可以是实盘引擎或者回测引擎，这样可以方便地**实现同一套代码同时跑回测和实盘**（以上参数均由策略引擎在使用策略类创建策略实例时自动传入，用户无需进行设置）。
+1. Inherit CTA template via super(), pass CTA engine, strategy name, vt_symbol, parameter settings in __init__. Note CTA engine can be live or backtest, for same code on backtest/live (parameters auto passed by engine on instance creation, no user set).
 
-2 . 调用K线生成模块（BarGenerator）：通过时间切片将Tick数据合成1分钟K线数据。如有需求，还可合成更长的时间周期数据，如15分钟K线。
+2. Call BarGenerator: Synthesize 1-min K-lines from Tick via time slices. If needed, synthesize longer periods like 15-min.
 
-3 . 调用K线时间序列管理模块（ArrayManager）：基于K线数据，如1分钟、15分钟，
-将其转化为便于向量化计算的时间序列数据结构，并在内部支持使用talib库来计算相应的技术指标。
+3. Call ArrayManager: Convert K-lines like 1-min, 15-min to vectorized time series structure, support talib for indicators.
 
-ArrayManager的默认长度为100，如需调整ArrayManager的长度，可传入size参数进行调整（size不能小于计算指标的周期长度）。
+ArrayManager default length 100, adjust via size param (size not less than indicator period).
 
-### 策略的回调函数
+### Strategy Callback Functions
 
-EliteTargetTemplate中以on开头的函数称为回调函数，在编写策略的过程中能够用来接收数据或者接收状态更新。回调函数的作用是当某一个事件发生的时候，策略里的这类函数会被CTA策略引擎自动调用（无需在策略中主动操作）。回调函数按其功能可分为以下三类：
+on_ functions in EliteTargetTemplate are callbacks for data or updates. Called auto by engine on events. Divided into three categories:
 
-#### 策略实例状态控制（所有策略都需要）
+#### Strategy Instance Status Control (Required)
 
 **on_init**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-初始化策略时on_init函数会被调用，默认写法是先调用write_log函数输出“策略初始化”日志，再调用load_bar函数加载历史数据。
+on_init called on init. Default write_log "Strategy initialization", then load_bar historical.
 
-策略初始化时，策略的inited和trading状态都为【False】，此时只是调用历史数据管理器计算并缓存相关的计算指标，不能发出交易信号。调用完on_init函数之后，策略的inited状态才变为【True】，策略初始化才完成。
+inited trading [False] on init, only calc cache indicators, no signals. After on_init, inited [True], init complete.
 
 **on_start**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-启动策略时on_start函数会被调用，默认写法是调用write_log函数输出“策略启动”日志。
+on_start called on start. Default write_log "Strategy started".
 
 **on_stop**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-停止策略时on_stop函数会被调用，默认写法是调用write_log函数输出“策略停止”日志。
+on_stop called on stop. Default write_log "Strategy stopped".
 
-调用策略的on_stop函数停止策略后，策略的trading状态变为【False】，此时策略就不会发出交易信号了。
+After on_stop, trading [False], no signals.
 
-#### 接收数据、计算指标、发出交易信号
+#### Receiving Data, Calculating, Signals
 
 **on_tick**
 
-* 入参：tick: TickData
+* Input: tick: TickData
 
-* 出参：无
+* Output: None
 
-绝大部分交易系统都只提供Tick数据的推送。即使一部分平台可以提供K线数据的推送，但是这些数据到达本地电脑的速度也会慢于Tick数据的推送，因为也需要平台合成之后才能推送过来。所以实盘的时候，VeighNa里所有的策略的K线都是由收到的Tick数据合成的。
+Most systems push Tick only. Even if some push K-lines, arrival slower than Tick, as synthesized first. So live, all strategy K-lines synthesized from received Tick.
 
-当策略收到最新的Tick数据的行情推送时，on_tick函数会被调用。默认写法是通过BarGenerator的update_tick函数把收到的Tick数据推进前面创建的bg实例中以便合成1分钟的K线。
+on_tick called on latest Tick push. Default BarGenerator update_tick pushes Tick to bg instance for 1-min synthesis.
 
 **on_bar**
 
-* 入参：bar: BarData
+* Input: bar: BarData
 
-* 出参：无
+* Output: None
 
-当策略收到最新的K线数据时（实盘时默认推进来的是基于Tick合成的一分钟的K线，回测时则取决于选择参数时填入的K线数据频率），on_bar函数就会被调用。
+on_bar called on latest K-line (live default 1-min from Tick, backtest depends on selected interval).
 
-#### 委托状态更新
+#### Order Updates
 
-以下函数在策略中可以直接pass，其具体逻辑应用交给回测/实盘引擎负责。
+Following can pass, logic by backtest/live engines.
 
 **on_trade**
 
-* 入参：trade: TradeData
+* Input: trade: TradeData
 
-* 出参：无
+* Output: None
 
-收到策略成交回报时on_trade函数会被调用。
+on_trade on trade returns.
 
 **on_order**
 
-* 入参：order: OrderData
+* Input: order: OrderData
 
-* 出参：无
+* Output: None
 
-收到策略委托回报时on_order函数会被调用。
+on_order on order returns.
 
 **on_stop_order**
 
-* 入参：stop_order: StopOrder
+* Input: stop_order: StopOrder
 
-* 出参：无
+* Output: None
 
-收到策略停止单回报时on_stop_order函数会被调用。
+on_stop_order on stop order returns.
 
-### 主动函数
+### Active Functions
 
-**buy**：买入开仓（Direction：LONG，Offset：OPEN）
+**buy**: Buy open (Direction: LONG, Offset: OPEN)
 
-**sell**：卖出平仓（Direction：SHORT，Offset：CLOSE）
+**sell**: Sell close (Direction: SHORT, Offset: CLOSE)
 
-**short**：卖出开仓（Direction：SHORT，Offset：OPEN）
+**short**: Short open (Direction: SHORT, Offset: OPEN)
 
-**cover**：买入平仓（Direction：LONG，Offset：CLOSE）
+**cover**: Cover close (Direction: LONG, Offset: CLOSE)
 
-* 入参：price: float, volume: float, stop: bool = False, lock: bool = False, net: bool = False
+* Input: price: float, volume: float, stop: bool = False, lock: bool = False, net: bool = False
 
-* 出参：vt_orderids: List[vt_orderid] / 无 
+* Output: vt_orderids: List[vt_orderid] / None 
 
-buy/sell/short/cover都是策略内部的负责发单的交易请求类函数。
+buy/sell/short/cover are internal trading request functions for orders.
 
 **send_order**
 
-* 入参：direction: Direction, offset: Offset, price: float, volume: float, stop: bool = False, lock: bool = False, net: bool = False
+* Input: direction: Direction, offset: Offset, price: float, volume: float, stop: bool = False, lock: bool = False, net: bool = False
 
-* 出参：vt_orderids / 无
+* Output: vt_orderids / None
 
-send_order函数是CTA策略引擎调用的发送委托的函数。一般在策略编写的时候不需要单独调用。
+send_order is engine-called send order function. Usually no separate call in strategy.
 
 **cancel_order**
 
-* 入参：vt_orderid: str
+* Input: vt_orderid: str
 
-* 出参：无
+* Output: None
 
 **cancel_all**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-cancel_order和cancel_all都是负责撤单的交易请求类函数。cancel_order是撤掉策略内指定的活动委托，cancel_all是撤掉策略所有的活动委托。
+cancel_order cancels specific active order, cancel_all all active.
 
 **set_target**
 
-* 入参：target: int
+* Input: target: int
 
-* 出参：无
+* Output: None
 
-set_target是用来设置策略目标净仓位的函数（可以理解为想要指定的策略持仓量）。正数代表做多、负数代表做空。
+set_target sets target net position. Positive long, negative short.
 
-请注意，目标仓位是一种持续性的状态，因此设置后在后续时间会持续保持下去，直到被再次设置修改。
+Note, persistent, remains until reset.
 
 **get_target**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-get_target是用来查询策略目标仓位的函数。
+get_target queries target.
 
 **execute_trading**
 
-* 入参：price_add: float, bar: BarData
+* Input: price_add: float, bar: BarData
 
-* 出参：无
+* Output: None
 
-execute_trading是基于设定的目标仓位用来执行交易的函数。委托下单和撤单已经被该函数接管，无需再在策略内进行下单和撤单操作。
+execute_trading executes based on target. Orders/cancels managed, no in strategy.
 
-execute_trading被调用之后，在函数内部会先撤销策略所有活动委托，然后根据策略目标和策略持仓的仓差（没有则不委托）进行委托。
+After call, cancels active, orders on target-position diff (none if no diff).
 
-### 功能函数
-
-以下为策略以外的功能函数：
+### Utility Functions
 
 **write_log**
 
-* 入参：msg: str
+* Input: msg: str
 
-* 出参：无
+* Output: None
 
-在策略中调用write_log函数，可以进行指定内容的日志输出。
+write_log for log output.
 
 **get_engine_type**
 
-* 入参：无
+* Input: None
 
-* 出参：engine_type: EngineType
+* Output: engine_type: EngineType
 
-如果策略对于回测和实盘时有不同的逻辑处理，可以调用get_engine_type函数获取当下使用的引擎类型来进行逻辑判断。
+If different logic backtest/live, get_engine_type for current type judgment.
 
-请注意，如果要调用该函数进行逻辑判断，请在策略文件顶部导入“EngineType”。
+Note, import "EngineType" at top if using.
 
 **get_pricetick**
 
-* 入参：无
+* Input: None
 
-* 出参：pricetick: float / None
+* Output: pricetick: float / None
 
-在策略中调用get_pricetick函数，可以获取交易合约的最小价格跳动。
+get_pricetick for min price tick.
 
 **get_size**
 
-* 入参：无
+* Input: None
 
-* 出参：size: int / None
+* Output: size: int / None
 
-在策略中调用get_size函数，可以获取交易合约的合约乘数。
+get_size for contract multiplier.
 
 **get_account_pos**
 
-* 入参：无
+* Input: None
 
-* 出参：size: int / None
+* Output: size: int / None
 
-在策略中调用get_account_pos函数，可以获取交易合约的账户持仓。
+get_account_pos for account position.
 
 **get_account**
 
-* 入参：无
+* Input: None
 
-* 出参：size: AccountData / None
+* Output: size: AccountData / None
 
-在策略中调用get_account函数，可以获取交易合约的账户资金。
+get_account for account balance.
 
 **load_bar**
 
-* 入参：days: int, interval: Interval = Interval.MINUTE, callback: Callable = None, use_database: bool = False
+* Input: days: int, interval: Interval = Interval.MINUTE, callback: Callable = None, use_database: bool = False
 
-* 出参：无
+* Output: None
 
-在策略中调用load_bar函数，可以在策略初始化时加载K线数据。
+load_bar loads K-lines on init.
 
-如下方代码所示，调用load_bar函数时，默认加载的天数是10，频率是一分钟，对应也就是加载10天的1分钟K线数据，建议加载的天数宁可多一些也不要太少。use_database参数默认为False，会先依次尝试通过交易接口、数据服务获取历史数据，直到获取历史数据或返回空。
+Default 10 days, minute, suggest more. use_database False, tries interface, service.
 
 **load_tick**
 
-* 入参：days: int
+* Input: days: int
 
-* 出参：无
+* Output: None
 
-在策略中调用load_tick函数，可以在策略初始化时加载Tick数据。
+load_tick loads Ticks on init.
 
 **put_event**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-在策略中调用put_event函数，可以通知图形界面刷新策略状态相关显示。
+put_event refreshes UI.
 
-请注意，要策略初始化完成，inited状态变为【True】之后，才能刷新界面。
+Note, after inited [True].
 
 **send_email**
 
-* 入参：msg: str
+* Input: msg: str
 
-* 出参：无
+* Output: None
 
-配置好邮箱相关信息之后，在策略中调用send_email函数，可以发送指定内容的邮件到自己的邮箱。
+send_email sends mail after config.
 
-请注意，要策略初始化完成，inited状态变为【True】之后，才能发送邮件。
+Note, after inited [True].
 
 **sync_data**
 
-* 入参：无
+* Input: None
 
-* 出参：无
+* Output: None
 
-在策略中调用sync_data函数，可以在实盘交易的时候，每次停止时都同步策略变量到对应json文件中进行本地缓存，方便第二天初始化时再进行读取还原（CTA策略引擎会去调用，在策略里无需主动调用）。
+sync_data syncs variables on live stop for cache (engine calls).
 
-请注意：
-   - 要在策略启动之后，也就是策略的trading状态变为【True】之后，才能同步策略信息；
+Note:
+   - After trading [True];
 
-   - 基于EliteCtaTemplate开发的策略，只有策略的持仓pos会被同步到本地，其他策略变量由理论值维护。
+   - EliteCtaTemplate only pos synced, others theoretical.
 
-## 历史数据管理器
+## History Manager
 
 <span id="jump2">
 
-HistoryManager是CTA策略模块自带的定长的历史数据管理器。所有基于EliteCtaTemplate开发的策略，都可通过on_history函数推送HistoryManager的实例hm获取K线数据进而进行指标计算和委托。
+HistoryManager is built-in fixed-length historical data manager in CTA module. All EliteCtaTemplate strategies get K-lines via on_history hm instance for indicators and orders.
 
-每个策略实例的HistoryManager都取决于策略类里定义的bar_window、bar_interval和bar_buffer三个参数。bar_window和bar_interval决定了HistoryManager内储存K线的时间频率，bar_buffer决定了HistoryManager容器的长度（HistoryManager内缓存的K线数不低于bar_buffer根时才算初始化成功）。
+Each instance HistoryManager depends on bar_window, bar_interval, bar_buffer. bar_window interval determine time frequency, bar_buffer container length (init success when cached >= bar_buffer).
 
-**datetime**：K线的开始时间
+**datetime**: K-line start time
 
-**open**：K线的开始价格
+**open**: K-line open price
 
-**high**：K线内的最高价
+**high**: K-line high
 
-**low**：K线内的最低价
+**low**: K-line low
 
-**close**：K线的结束价格
+**close**: K-line close price
 
-**volume**：K线内的成交量
+**volume**: K-line volume
 
-**turnover**：K线内的成交额
+**turnover**: K-line turnover
 
-**open_interest**：K线内的持仓量（股票没有该字段）
+**open_interest**: K-line open interest (no for stocks)
 
-HistoryManager里对合成K线的datetime、open、high、low、close、volume、turnover和open_interest都进行了缓存，便于用户取用。以open_price为例，通过策略on_history里收到的hm实例可直接获取open_price的数组（hm.open）。如果想获取最新一根合成K线的开始价格，直接取出该数组的最后一个元素（hm.open[-1]）即可。
+HistoryManager caches datetime, open, high, low, close, volume, turnover, open_interest for synthesized K-lines. For open_price, get array via hm instance (hm.open). Latest open: hm.open[-1].
 
 **bar_count**
 
-* 入参：无
+* Input: None
 
-* 出参：int
+* Output: int
 
-如果策略启动之后策略指标的值都是0，可以调用HistoryManager的bar_count函数（hm.bar_count()）看看HistoryManager缓存过的K线长度是否小于策略类设置的bar_buffer，如果小于的话说明历史数据太短了不够HistoryManager容器初始化。此时可以选择加载更多历史数据进行策略初始化或者适当调小bar_buffer解决。
+If indicators 0 after start, call hm.bar_count() check if < bar_buffer, means short data, not init. Load more or reduce bar_buffer.
 
 **to_dataframe**
 
-* 入参：无
+* Input: None
 
-* 出参：df: pd.DataFrame
+* Output: df: pd.DataFrame
 
-如果想把on_history推送的hm实例缓存的合成K线的信息转换成DataFrame，可以调用HistoryManager的to_dataframe函数（hm.to_dataframe()）进行转换。转换之后可以得到一个长度为策略类设置的bar_buffer、以K线开始时间作为索引，open、high、low、close、volume、turnover和open_interest作为列名的DataFrame。
+To convert hm cached K-lines to DataFrame, call hm.to_dataframe(). Gets length bar_buffer, index datetime, columns open, high, low, close, volume, turnover, open_interest.
 
 </span>
