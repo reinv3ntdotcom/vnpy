@@ -1,4 +1,7 @@
-量化策略
+Quantitative Strategy
+* **quantitative trading strategy** (in finance/investing)
+* **systematic strategy** (often used in asset management)
+
 ~~~~~~~~~
 
 .. toctree::
