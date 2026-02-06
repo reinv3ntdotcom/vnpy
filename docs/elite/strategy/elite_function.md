@@ -1,263 +1,263 @@
-# 指标计算函数
+# Indicator Calculation Functions
 
-VeighNa Elite Trader的CTA策略模块内置了以下计算函数供策略调用：
+VeighNa Elite Trader's CTA strategy module has the following built-in calculation functions for strategy calls:
 
-**sma** ：简单移动平均
+**sma**: Simple Moving Average
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=30
 
-* 出参
+* Outputs
   * sma_array: np.ndarray
 
-**ema** ：指数滑动平均
+**ema**: Exponential Moving Average
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=30
 
-* 出参
+* Outputs
   * ema_array: np.ndarray
 
-**kama** ：适应性移动平均
+**kama**: Adaptive Moving Average
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=30
 
-* 出参
+* Outputs
   * atr_array: np.ndarray
 
-**wma** ：加权移动平均
+**wma**: Weighted Moving Average
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=30
 
-* 出参
+* Outputs
   * wma_array: np.ndarray
 
-**apo**：绝对价格振荡器
+**apo**: Absolute Price Oscillator
 
-* 入参
+* Inputs
   * close: np.ndarray
   * fast_period: int=12
   * slow_period: int=26
   * matype: int=0
 
-* 出参
+* Outputs
   * apo_array: np.ndarray
 
-请注意，matype分别对应：0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3
+Please note that matype corresponds to: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3
 
-**cmo**：钱德动量摆动指标
+**cmo**: Chande Momentum Oscillator
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * cmo_array: np.ndarray
 
-**mom**：上升动向值
+**mom**: Momentum
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=10
 
-* 出参
+* Outputs
   * mom_array: np.ndarray
 
-**ppo**：价格震荡百分比指数
+**ppo**: Percentage Price Oscillator
 
-* 入参
+* Inputs
   * close: np.ndarray
   * fast_period: int=12
   * slow_period: int=26
   * matype: int=0
 
-* 出参
+* Outputs
   * ppo_array: np.ndarray
 
-**roc**：变动率指标
+**roc**: Rate of Change
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=10
 
-* 出参
+* Outputs
   * roc_array: np.ndarray
 
-**rocr**：变动率比率
+**rocr**: Rate of Change Ratio
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=10
 
-* 出参
+* Outputs
   * rocr_array: np.ndarray
 
-**rocp**：变动率百分比
+**rocp**: Rate of Change Percentage
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=10
 
-* 出参
+* Outputs
   * rocp_array: np.ndarray
 
-**trix**：三次平滑EMA的一天变化率
+**trix**: Triple Exponential Moving Average One-Day Rate of Change
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=30
 
-* 出参
+* Outputs
   * trix_array: np.ndarray
 
-**stddev**：标准偏差
+**stddev**: Standard Deviation
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=5
   * nbdev: float=1
 
-* 出参
+* Outputs
   * stddev_array: np.ndarray
 
-**std**：标准偏差
+**std**: Standard Deviation
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=5
   * nbdev: float=1
 
-* 出参
+* Outputs
   * std_array: np.ndarray
 
-**obv**：能量潮
+**obv**: On-Balance Volume
 
-* 入参
+* Inputs
   * close: np.ndarray
   * volume: np.ndarray
 
-* 出参
+* Outputs
   * obv_array: np.ndarray
 
-**cci**：顺势指标
+**cci**: Commodity Channel Index
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * cci_array: np.ndarray
 
-**atr**：真实波动幅度均值
+**atr**: Average True Range
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * atr_array: np.ndarray
 
-**natr**：归一化波动幅度均值
+**natr**: Normalized Average True Range
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * natr_array: np.ndarray
 
-**rsi**：相对强弱指数
+**rsi**: Relative Strength Index
 
-* 入参
+* Inputs
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * rsi_array: np.ndarray
 
-**macd**：平均异同移动平均线
+**macd**: Moving Average Convergence Divergence
 
-* 入参
+* Inputs
   * close: np.ndarray
   * fast_period: int=12
   * slow_period: int=26
   * signal_period: int=9
 
-* 出参
+* Outputs
   * macd_array: np.ndarray
   * macdsignal_array: np.ndarray
   * macdhist_array: np.ndarray
 
-**adx**：平均趋向指数
+**adx**: Average Directional Index
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * adx_array: np.ndarray
 
-**adxr**：平均趋向指数的趋向指数
+**adxr**: Average Directional Movement Index Rating
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * adxr_array: np.ndarray
 
-**minus_di**：负趋向指标
+**minus_di**: Minus Directional Indicator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * minusdi_array: np.ndarray
 
-**plus_di**：正趋向指标
+**plus_di**: Plus Directional Indicator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * plusdi_array: np.ndarray
 
-**willr**：威廉指标
+**willr**: Williams' %R
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * willr_array: np.ndarray
 
-**ultosc**：终极波动指标
+**ultosc**: Ultimate Oscillator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
@@ -265,86 +265,86 @@ VeighNa Elite Trader的CTA策略模块内置了以下计算函数供策略调用
   * time_period2: int=14
   * time_period3: int=28
 
-* 出参
+* Outputs
   * ultosc_array: np.ndarray
 
-**trange**：真实波幅
+**trange**: True Range
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
 
-* 出参
+* Outputs
   * trange_array: np.ndarray
 
-**aroon**：阿隆指标
+**aroon**: Aroon Indicator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * aroonup_array: np.ndarray
   * aroondown_array: np.ndarray
 
-**aroonosc**：阿隆震荡
+**aroonosc**: Aroon Oscillator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * aroonosc_array: np.ndarray
 
-**minus_dm**：负趋向变动值
+**minus_dm**: Minus Directional Movement
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * minusdm_array: np.ndarray
 
-**plus_dm**：正趋向变动值
+**plus_dm**: Plus Directional Movement
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * plusdm_array: np.ndarray
 
-**mfi**：资金流量指标
+**mfi**: Money Flow Index
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * volume: np.ndarray
   * time_period: int=14
 
-* 出参
+* Outputs
   * mfi_array: np.ndarray
 
-**ad**：平衡交易量指标
+**ad**: Accumulation/Distribution Line
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * volume: np.ndarray
 
-* 出参
+* Outputs
   * ad_array: np.ndarray
 
-**adosc**：震荡指标
+**adosc**: Chaikin Oscillator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
@@ -352,23 +352,23 @@ VeighNa Elite Trader的CTA策略模块内置了以下计算函数供策略调用
   * fast_period: int=3
   * slow_period: int=10
 
-* 出参
+* Outputs
   * adosc_array: np.ndarray
 
-**bop**：均势指标
+**bop**: Balance of Power
 
-* 入参
+* Inputs
   * open: np.ndarray
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
 
-* 出参
+* Outputs
   * bop_array: np.ndarray
 
-**stoch**：随机指标
+**stoch**: Stochastic Oscillator
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
@@ -378,98 +378,98 @@ VeighNa Elite Trader的CTA策略模块内置了以下计算函数供策略调用
   * slowd_period: int=3
   * slowd_matype: int=0
 
-* 出参
+* Outputs
   * slowk_array: np.ndarray
   * slowd_array: np.ndarray
 
-**boll**：布林通道
+**boll**: Bollinger Bands
 
-* 入参
+* Inputs
   * data: np.ndarray
   * window: int
   * dev: float
 
-* 出参
+* Outputs
   * bollup_array: np.ndarray
   * bolldown_array: np.ndarray
 
-**keltner**：肯特纳通道
+**keltner**: Keltner Channel
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * close: np.ndarray
   * window: int
   * dev: float
 
-* 出参
+* Outputs
   * kkup_array: np.ndarray
   * kkdown_array: np.ndarray
 
-**donchian**：唐奇安通道
+**donchian**: Donchian Channel
 
-* 入参
+* Inputs
   * high: np.ndarray
   * low: np.ndarray
   * window: int
 
-* 出参
+* Outputs
   * donchianup_array: np.ndarray
   * donchiandown_array: np.ndarray
 
-**cross_over**：上穿
+**cross_over**: Cross Above
 
-* 入参
+* Inputs
   * data: np.ndarray
   * level: float
 
-若data上一个值小于等于level以及data最新值大于level，则返回True。
+If the previous value of data is less than or equal to level and the latest value of data is greater than level, then return True.
 
-* 出参
+* Outputs
   * cross_over: bool
 
-**cross_below**：下穿
+**cross_below**: Cross Below
 
-* 入参
+* Inputs
   * data: np.ndarray
   * level: float
 
-* 出参
+* Outputs
   * cross_below: bool
 
-若data上一个值大于等于level以及data最新值小于level，则返回True。
+If the previous value of data is greater than or equal to level and the latest value of data is less than level, then return True.
 
-**check_increasing**：检查序列单调上升
+**check_increasing**: Check if Sequence is Monotonically Increasing
 
-* 入参
+* Inputs
   * data: np.ndarray
 
-* 出参
+* Outputs
   * increasing: bool
 
-**check_decreasing**：检查序列单调下降
+**check_decreasing**: Check if Sequence is Monotonically Decreasing
 
-* 入参
+* Inputs
   * data: np.ndarray
 
-* 出参
+* Outputs
   * decreasing: bool
 
-**resample_data**：对K线数据重新取样
+**resample_data**: Resample Candlestick Data
 
-* 入参
+* Inputs
   * df: pd.DataFrame
   * rule: str
 
-* 出参
+* Outputs
   * resampled_df: pd.DataFrame
 
-* 示例
+* Example
 
-若想要测试resample_data函数的效果，可以在策略的on_history函数收到hm推送的时候先获取K线DataFrame，再调用resample_data函数对K线数据重新取样，如下所示：
+If you want to test the effect of the resample_data function, you can first get the candlestick DataFrame when the strategy's on_history function receives the hm push, then call the resample_data function to resample the candlestick data, as shown below:
 
 ```python3
-# 判断实盘trading状态，只有策略启动之后才进行输出
+# Determine the live trading status; only output after the strategy starts
 df: pd.DataFrame = hm.to_dataframe()
 resampled_df: pd.DataFrame = resample_data(df, "5min")
 ```
