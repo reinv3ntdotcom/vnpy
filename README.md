@@ -1,22 +1,6 @@
 ````md
 # VeighNa — By Traders, For Traders. AI-Powered.
 
-<p align="center">
-  <img src="https://vnpy.oss-cn-shanghai.aliyuncs.com/veighna-logo.png" alt="VeighNa logo" />
-</p>
-
-<p align="center">
-  <a href="README.md">💬 Read this in <strong>Chinese</strong></a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.0-blueviolet.svg" alt="version 4.3.0" />
-  <img src="https://img.shields.io/badge/platform-windows%20%7C%20linux%20%7C%20macos-yellow.svg" alt="platform windows linux macos" />
-  <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg" alt="python 3.10-3.13" />
-  <img src="https://img.shields.io/github/actions/workflow/status/vnpy/vnpy/pythonapp.yml?branch=master" alt="build status" />
-  <img src="https://img.shields.io/github/license/vnpy/vnpy.svg?color=orange" alt="license" />
-</p>
-
 VeighNa is a Python-based, open-source quantitative trading framework that has grown—step by step—into a multi-functional quantitative trading platform through continuous contributions from the community. Since its release, it has attracted many users from financial institutions and related fields, including private equity funds, securities companies, futures companies, and more.
 
 ## Getting Help
